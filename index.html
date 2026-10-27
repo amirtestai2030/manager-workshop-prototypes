@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>אבות טיפוס לסדנא</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+  html, body { margin: 0; }
+  /* Layout: a projector-friendly gallery. One wide column; eight cards 2-up, each with name, pain, what the demo shows, ease meter, a QR code for phones and an open button. Same tokens as the ideas bank. */
+  :root {
+    --bg: #F3F4F1; --surface: #FFFFFF; --sunk: #EEF0EC; --ink: #17212B; --muted: #55606B;
+    --line: #DCE0DA; --line2: #9AA3AC; --accent: #1E4FA8; --on-accent: #FFFFFF;
+    --warm: #A9480C; --warm-soft: #FBEBDD; --ok: #2F6B3F;
+    --font: Assistant, "Segoe UI", Arial, sans-serif;
+    --display: Rubik, Assistant, "Segoe UI", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12171D; --surface: #1B222A; --sunk: #151B21; --ink: #EEF1F4; --muted: #A7B0BA;
+      --line: #2C3640; --line2: #56636F; --accent: #8EB0F2; --on-accent: #0E1620;
+      --warm: #F0A464; --warm-soft: #3A2A1C; --ok: #86C79A;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12171D; --surface: #1B222A; --sunk: #151B21; --ink: #EEF1F4; --muted: #A7B0BA;
+    --line: #2C3640; --line2: #56636F; --accent: #8EB0F2; --on-accent: #0E1620;
+    --warm: #F0A464; --warm-soft: #3A2A1C; --ok: #86C79A;
+    color-scheme: dark;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.5; }
+  h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .wrap {
+    max-width: 1180px; margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 48px 80px;
+    display: flex; flex-direction: column; gap: 40px;
+  }
+  .top { display: flex; flex-direction: column; gap: 16px; border-bottom: 2px solid var(--ink); padding-bottom: 28px; }
+  .kicker { font-size: 15px; font-weight: 700; letter-spacing: .04em; color: var(--accent); }
+  h1 { font-weight: 700; font-size: clamp(34px, 5.5vw, 56px); line-height: 1.05; }
+  .lead { font-size: 20px; color: var(--muted); max-width: 70ch; text-wrap: pretty; }
+  .how { display: flex; flex-wrap: wrap; gap: 12px 28px; font-size: 16px; }
+  .how span { display: inline-flex; align-items: center; gap: 8px; }
+  .how b { font-family: var(--display); color: var(--accent); }
+  .note { padding: 12px 16px; border: 1px dashed var(--line2); border-radius: 12px; font-size: 15px; color: var(--muted); max-width: 70ch; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(520px, 100%), 1fr)); gap: 24px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 26px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  .card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .card h2 { font-size: 26px; font-weight: 700; line-height: 1.2; }
+  .lbl { font-size: 13px; font-weight: 700; color: var(--muted); }
+  .blk { display: flex; flex-direction: column; gap: 4px; }
+  .blk p:last-child { font-size: 17px; text-wrap: pretty; }
+  .body { display: flex; gap: 20px; align-items: stretch; }
+  .texts { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+  .qr { flex: none; width: 128px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .qr .box { width: 128px; height: 128px; background: #FFFFFF; border: 1px solid var(--line); border-radius: 10px; padding: 8px; display: grid; place-items: center; }
+  .qr .box svg { width: 100%; height: 100%; display: block; }
+  .qr span { font-size: 12px; color: var(--muted); text-align: center; }
+  @media (max-width: 420px) { .body { flex-direction: column; } .qr { align-self: center; } }
+  .ease { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; background: var(--sunk); border-radius: 12px; padding: 12px 14px; }
+  .ease-val { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; }
+  .bars { display: inline-flex; gap: 3px; align-items: flex-end; }
+  .bars i { display: block; width: 6px; border-radius: 2px; background: var(--line2); }
+  .bars i:nth-child(1) { height: 8px; } .bars i:nth-child(2) { height: 12px; } .bars i:nth-child(3) { height: 16px; }
+  .bars[data-level="3"] i, .bars[data-level="2"] i:nth-child(-n+2), .bars[data-level="1"] i:first-child { background: var(--ink); }
+  .reason { font-size: 15px; color: var(--muted); flex-basis: 100%; }
+  .foot { margin-top: auto; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+  .open { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 24px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 17px; text-decoration: none; }
+  .open svg { width: 18px; height: 18px; }
+  .tag { font-size: 14px; font-weight: 600; padding: 4px 12px; border-radius: 999px; background: var(--warm-soft); }
+  .closing { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--line); padding-top: 24px; font-size: 16px; color: var(--muted); max-width: 70ch; }
+  .closing a { color: var(--accent); font-weight: 700; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+</head>
+<body>
+<div class="wrap" dir="rtl" lang="he">
+  <header class="top">
+    <p class="kicker">סדנת מנהלים</p>
+    <h1>אבות טיפוס לסדנא</h1>
+    <p class="lead">שמונה אפליקציות קטנות, אחת לכל רעיון במאגר. כל אחת נבנתה בלי לכתוב קוד, עם נתוני דוגמה בלבד, כדי שתוכלו להרגיש איך זה עובד ולהחליט מה שווה לבנות באמת.</p>
+    <div class="how">
+      <span><b>1</b> סורקים את ה-QR בטלפון, או לוחצים "לפתוח".</span>
+      <span><b>2</b> משחקים דקה. הכול נשמר רק על המכשיר שלכם.</span>
+      <span><b>3</b> חוזרים למאגר הרעיונות ומסמנים "אני רוצה לבנות את זה".</span>
+    </div>
+    <p class="note">כל אב טיפוס הוא נקודת פתיחה, לא מוצר. מה שחסר בו הוא בדיוק מה שתגדירו באפיון. אין כאן מידע פנימי, ואל תכתבו כאן מידע כזה.</p>
+  </header>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="closing">
+    <p>יש לכם רעיון שלא מופיע כאן? זו הסיבה שהמאגר פתוח. הוסיפו אותו, ובסדנא הבאה ייתכן שיהיה לו אב טיפוס משלו.</p>
+    <p><a href="https://claude.ai/artifact/Pa3BkeyHtp9TzQxe1Kde4d" target="_blank" rel="noopener">חזרה למאגר הרעיונות</a></p>
+    <p>אבות טיפוס להדגמה בסדנא. נתוני דוגמה בלבד. נבנו עם Claude, בלי לכתוב קוד.</p>
+  </div>
+</div>
+
+<script>
+  const APPS = [
+    { name: "לימוד מילים בערבית", url: "words.html",
+      pain: "אוצר מילים מקצועי בערבית מפוזר בדפים ובקבצים, ואין תרגול קבוע.",
+      demo: "כרטיסיות: מילה בעברית, הופכים לערבית, מסמנים ידעתי או לא ידעתי. מה שלא ידעתם חוזר.",
+      level: 3, ease: "קל", reason: "תוכן קבוע, בלי שיתוף נתונים בין עובדים." },
+    { name: "לימוד תא השטח", url: "area.html",
+      pain: "עובד חדש צריך להכיר את השטח, והידע עובר בעל פה.",
+      demo: "חמישה נושאים, בכל אחד הסבר קצר וחידון של שלוש שאלות. יש גם מצב חונך.",
+      level: 2, ease: "בינוני", reason: "התוכן עלול להיות רגיש. כאן הכול על רובע בדוי." },
+    { name: "סוגיות אסלאמיות וחגים", url: "holidays.html",
+      pain: "מידע על חגים ומנהגים לא מרוכז ולא מגיע בזמן.",
+      demo: "החג הקרוב עם ספירה לאחור, מה כדאי לדעת בעבודה, ברכה בערבית וחידון. ועוד לשונית מושגים.",
+      level: 3, ease: "קל", reason: "תוכן קבוע." },
+    { name: "סיור לגיבוש ענפי", url: "tour.html",
+      pain: "בסיור קשה לרכז מסלול, תחנות והסברים, והכול על דפים.",
+      demo: "שש תחנות ביפו, בכל אחת הסבר ומשימה לקבוצה. מצב מארגן לעריכת המסלול.",
+      level: 2, ease: "בינוני", reason: "בלי מפה ובלי מיקום, בכוונה." },
+    { name: "פודקאסט ענפי שבועי", url: "podcast.html",
+      pain: "עדכונים שבועיים לא מגיעים לכולם או לא נקראים.",
+      demo: "הפרק של השבוע ורשימת פרקים, נגן עם התקדמות שנשמרת, נקודות עיקריות ושאלה לפרק.",
+      level: 1, ease: "מאתגר", reason: "הנגן כאן מדומה. קבצי שמע אמיתיים דורשים אחסון ואישורים." },
+    { name: "חוסן ענפי", url: "resilience.html",
+      pain: "בשגרה עמוסה לא עוצרים לראות מה הלך טוב.",
+      demo: "מנטרה יומית, שדה אחד לדבר טוב, סימון לשיתוף בישיבה. מצב מנהל מציג מה שותף.",
+      level: 2, ease: "בינוני", reason: "שומרים רק את הדבר הטוב. בלי מצב רוח ובלי מידע אישי." },
+    { name: "מתכונים ענפיים", url: "recipes.html",
+      pain: "מתכונים טובים עוברים בעל פה ואחר כך הולכים לאיבוד.",
+      demo: "חיפוש, סינון לפי קטגוריה, צ'קליסט מצרכים לבישול, והוספת מתכון עם אימות.",
+      level: 2, ease: "בינוני", reason: "טקסט בלבד, בלי תמונות, כדי להתחיל פשוט." },
+    { name: "פתגמים מהערבית המדוברת", url: "proverbs.html",
+      pain: "ביטויים מצחיקים מהיום-יום נשכחים, ואין דרך כיפית לתרגל יחד.",
+      demo: "הביטוי של השבוע, אתגר עם נקודות, תרגול של חמש שאלות, והוספת ביטוי משלכם.",
+      level: 2, ease: "בינוני", reason: "נקודות אישיות. בלי לוח מובילים, בכוונה." },
+  ];
+
+  function h(tag, props = {}, ...children) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (v == null || v === false) continue;
+      if (k === "class") el.className = v;
+      else if (k === "text") el.textContent = v;
+      else el.setAttribute(k, v === true ? "" : String(v));
+    }
+    for (const c of children.flat()) {
+      if (c == null || c === false) continue;
+      el.append(typeof c === "string" ? document.createTextNode(c) : c);
+    }
+    return el;
+  }
+
+  function qrSvg(url) {
+    try {
+      const qr = qrcode(0, "M");
+      qr.addData(new URL(url, location.href).href);
+      qr.make();
+      const tpl = document.createElement("template");
+      tpl.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+      return tpl.content.firstElementChild;
+    } catch (e) {
+      return h("span", { text: "QR לא זמין" });
+    }
+  }
+
+  const grid = document.getElementById("grid");
+  for (const a of APPS) {
+    const bars = h("span", { class: "bars", "data-level": String(a.level), "aria-hidden": "true" }, h("i"), h("i"), h("i"));
+    const card = h("article", { class: "card" },
+      h("div", { class: "card-head" }, h("h2", { text: a.name }), h("span", { class: "tag", text: "אב טיפוס" })),
+      h("div", { class: "body" },
+        h("div", { class: "texts" },
+          h("div", { class: "blk" }, h("p", { class: "lbl", text: "הכאב" }), h("p", { text: a.pain })),
+          h("div", { class: "blk" }, h("p", { class: "lbl", text: "מה מדגימים" }), h("p", { text: a.demo })),
+          h("div", { class: "ease" },
+            h("p", { class: "lbl", text: "כמה קל להתחיל" }),
+            h("span", { class: "ease-val" }, bars, a.ease),
+            h("span", { class: "reason", text: a.reason }))),
+        h("div", { class: "qr" }, h("div", { class: "box", role: "img", "aria-label": "קוד QR לפתיחה בטלפון" }, qrSvg(a.url)), h("span", { text: "סרקו בטלפון" }))),
+      h("div", { class: "foot" },
+        h("a", { class: "open", href: a.url },
+          "לפתוח את אב הטיפוס",
+          (() => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("fill", "none"); s.setAttribute("stroke", "currentColor"); s.setAttribute("stroke-width", "2.5"); s.setAttribute("stroke-linecap", "round"); s.setAttribute("stroke-linejoin", "round"); s.setAttribute("aria-hidden", "true"); const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("d", "M19 12H5M11 18l-6-6 6-6"); s.append(p); return s; })())));
+    grid.append(card);
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,643 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>לימוד מילים בערבית</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;700&display=swap">
+<style>
+/* פריסה: אפליקציית טלפון אחת (מסגרת 430px) עם כרטיס אחד במרכז, שני כפתורי תשובה גדולים מתחתיו, ולשונית רשימה. */
+:root {
+  --bg: #F3F4F1; --surface: #FFFFFF; --sunk: #EEF0EC; --ink: #17212B; --muted: #55606B;
+  --line: #DCE0DA; --line2: #9AA3AC; --accent: #1E4FA8; --on-accent: #FFFFFF;
+  --warm: #A9480C; --warm-soft: #FBEBDD; --on-warm: #FFFFFF; --ok: #2F6B3F; --danger: #B42318;
+  --font: Assistant, "Segoe UI", Arial, sans-serif;
+  --display: Rubik, Assistant, "Segoe UI", Arial, sans-serif;
+  --ok-soft: #E3F0E6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12171D; --surface: #1B222A; --sunk: #151B21; --ink: #EEF1F4; --muted: #A7B0BA;
+    --line: #2C3640; --line2: #56636F; --accent: #8EB0F2; --on-accent: #0E1620;
+    --warm: #F0A464; --warm-soft: #3A2A1C; --on-warm: #1A1007; --ok: #86C79A; --danger: #FF9B8F;
+    --ok-soft: #1E3326;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12171D; --surface: #1B222A; --sunk: #151B21; --ink: #EEF1F4; --muted: #A7B0BA;
+  --line: #2C3640; --line2: #56636F; --accent: #8EB0F2; --on-accent: #0E1620;
+  --warm: #F0A464; --warm-soft: #3A2A1C; --on-warm: #1A1007; --ok: #86C79A; --danger: #FF9B8F;
+  --ok-soft: #1E3326;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+button { font: inherit; color: inherit; }
+button:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ===== מעטפת הדף + מסגרת הטלפון ===== */
+.page {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.demo-head {
+  display: none;
+  text-align: center;
+  padding-block: 20px 12px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.demo-head h1 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 18px;
+  margin: 0 0 2px;
+}
+.demo-head p { margin: 0; color: var(--muted); font-size: 14px; }
+
+.phone {
+  width: 100%;
+  min-height: 100%;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 481px) {
+  .demo-head { display: block; }
+  .page { padding-block: 0 32px; }
+  .phone {
+    max-width: 430px;
+    min-height: 760px;
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    overflow: hidden;
+  }
+}
+
+/* ===== כותרת האפליקציה ===== */
+.app-head {
+  padding-block: 14px 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  border-bottom: 1px solid var(--line);
+}
+.app-head h2 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 22px;
+  margin: 0 0 10px;
+  text-wrap: balance;
+}
+.tabs { display: flex; gap: 4px; }
+.tab {
+  flex: 1;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  border-bottom: 3px solid transparent;
+  color: var(--muted);
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+}
+.tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ===== גוף ===== */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-block: 16px 20px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  gap: 16px;
+}
+.view { display: flex; flex-direction: column; gap: 16px; flex: 1; }
+
+/* התקדמות */
+.progress { display: flex; flex-direction: column; gap: 6px; }
+.progress-row { display: flex; justify-content: space-between; align-items: baseline; }
+.progress-row strong { font-family: var(--display); font-weight: 500; font-variant-numeric: tabular-nums; }
+.progress-row span { color: var(--muted); font-size: 14px; }
+.bar { height: 6px; background: var(--sunk); border-radius: 999px; overflow: hidden; }
+.bar > div { height: 100%; background: var(--accent); width: 0; transition: width .25s ease; border-radius: 999px; }
+
+/* כרטיס */
+.card {
+  width: 100%;
+  flex: 1;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 16px;
+  background: var(--sunk);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  cursor: pointer;
+  text-align: center;
+  transition: background .15s ease;
+}
+.card.flipped { background: var(--warm-soft); border-color: var(--warm); }
+.card .eyebrow {
+  font-size: 13px;
+  letter-spacing: .04em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.card .he {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+.card.flipped .he { font-size: 20px; font-weight: 500; color: var(--muted); }
+.card .ar {
+  font-size: 48px;
+  line-height: 1.3;
+  font-weight: 700;
+  font-family: "Segoe UI", "Noto Naskh Arabic", "Arial", sans-serif;
+}
+.card .tr { font-size: 22px; font-weight: 600; }
+.card .hint { font-size: 14px; color: var(--muted); margin-top: 6px; }
+
+/* כפתורים */
+.btn {
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: 1px solid var(--line2);
+  background: var(--surface);
+  font-weight: 700;
+  font-size: 17px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn-ok { background: var(--ok); color: #fff; border-color: var(--ok); }
+:root[data-theme="dark"] .btn-ok { color: #0E1620; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn-ok { color: #0E1620; } }
+.btn-warm { background: var(--warm); color: var(--on-warm); border-color: var(--warm); }
+.btn-ghost { border-color: transparent; background: transparent; color: var(--accent); font-weight: 600; }
+.btn-block { width: 100%; }
+.answers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.answers .btn { min-height: 56px; font-size: 18px; }
+.row-end { display: flex; justify-content: center; }
+
+/* סיכום */
+.summary-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.summary-card h3 { font-family: var(--display); font-weight: 700; font-size: 24px; margin: 0; text-wrap: balance; }
+.summary-card p { margin: 0; color: var(--muted); }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat { border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 2px; }
+.stat .n { font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat .l { font-size: 14px; font-weight: 600; }
+.stat-ok { background: var(--ok-soft); color: var(--ok); }
+.stat-warm { background: var(--warm-soft); color: var(--warm); }
+.summary-actions { display: flex; flex-direction: column; gap: 10px; }
+.unknown-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  background: var(--warm-soft);
+  color: var(--warm);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* רשימת כל המילים */
+.list-head { display: flex; justify-content: space-between; align-items: baseline; }
+.list-head h3 { font-family: var(--display); font-weight: 700; font-size: 18px; margin: 0; }
+.list-head span { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-inline-end: 5px; vertical-align: middle; }
+.i-ok { background: var(--ok); } .i-warm { background: var(--warm); } .i-none { background: var(--line2); }
+.words { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.words li {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  min-height: 56px;
+}
+.words li:last-child { border-bottom: 0; }
+.words .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--line2); }
+.words li[data-mark="known"] .dot { background: var(--ok); }
+.words li[data-mark="unknown"] .dot { background: var(--warm); }
+.words .w { min-width: 0; display: flex; flex-direction: column; }
+.words .w .he { font-weight: 700; }
+.words .w .tr { font-size: 14px; color: var(--muted); }
+.words .ar { font-size: 22px; font-weight: 600; font-family: "Segoe UI", "Noto Naskh Arabic", "Arial", sans-serif; }
+.mark { font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.words li[data-mark="known"] .mark { color: var(--ok); }
+.words li[data-mark="unknown"] .mark { color: var(--warm); }
+
+/* פוטר */
+footer {
+  border-top: 1px solid var(--line);
+  padding-block: 10px calc(10px + env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+.reset {
+  min-height: 44px;
+  background: transparent;
+  border: 0;
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.toast {
+  font-size: 14px;
+  color: var(--ok);
+  font-weight: 600;
+  min-height: 20px;
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="demo-head">
+    <h1>אב טיפוס להדגמה</h1>
+    <p>נתוני דוגמה בלבד. שום דבר לא נשלח לשרת.</p>
+  </div>
+
+  <div class="phone">
+    <header class="app-head">
+      <h2>לימוד מילים בערבית</h2>
+      <div class="tabs" role="tablist" aria-label="מסכים">
+        <button class="tab" role="tab" id="tab-practice" aria-selected="true" aria-controls="view-practice" type="button">תרגול</button>
+        <button class="tab" role="tab" id="tab-list" aria-selected="false" aria-controls="view-list" type="button">כל המילים</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- תרגול -->
+      <section class="view" id="view-practice" role="tabpanel" aria-labelledby="tab-practice">
+        <div class="progress" id="progress">
+          <div class="progress-row">
+            <strong id="progress-text">0 / 0</strong>
+            <span id="progress-sub">כרטיסים בסבב הזה</span>
+          </div>
+          <div class="bar" aria-hidden="true"><div id="progress-fill"></div></div>
+        </div>
+
+        <div id="practice-area" class="view">
+          <button class="card" id="card" type="button" aria-live="polite"></button>
+          <div id="answer-area"></div>
+          <div class="row-end">
+            <button class="btn btn-ghost" id="finish-btn" type="button">סיימתי להיום</button>
+          </div>
+        </div>
+
+        <div id="summary-area" class="view" hidden>
+          <div class="summary-card">
+            <h3 id="summary-title">סיימת להיום</h3>
+            <p id="summary-sub"></p>
+            <div class="stats">
+              <div class="stat stat-ok"><span class="n" id="stat-known">0</span><span class="l">ידעתי</span></div>
+              <div class="stat stat-warm"><span class="n" id="stat-unknown">0</span><span class="l">לא ידעתי</span></div>
+            </div>
+            <div class="unknown-list" id="unknown-chips"></div>
+            <div class="summary-actions">
+              <button class="btn btn-primary btn-block" id="retry-btn" type="button">סבב חוזר על מה שלא ידעתי</button>
+              <button class="btn btn-block" id="new-round-btn" type="button">סבב חדש על כל המילים</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- כל המילים -->
+      <section class="view" id="view-list" role="tabpanel" aria-labelledby="tab-list" hidden>
+        <div class="list-head">
+          <h3>כל המילים</h3>
+          <span id="list-count"></span>
+        </div>
+        <div class="legend">
+          <span><i class="i-ok"></i>ידעתי</span>
+          <span><i class="i-warm"></i>לא ידעתי</span>
+          <span><i class="i-none"></i>עדיין לא תורגל</span>
+        </div>
+        <ul class="words" id="words"></ul>
+      </section>
+    </main>
+
+    <footer>
+      <div class="toast" id="toast" aria-live="polite"></div>
+      <button class="reset" id="reset-btn" type="button">איפוס לדוגמה</button>
+      <div>אב טיפוס להדגמה בסדנא. נתוני דוגמה בלבד. נבנה עם Claude, בלי לכתוב קוד.</div>
+    </footer>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  document.documentElement.lang = 'he';
+  document.documentElement.dir = 'rtl';
+
+  // ----- נתוני דוגמה: 30 מילים כלליות למקום עבודה -----
+  var WORDS = [
+    { he: 'תודה',       ar: 'شكراً',        tr: 'שוּכְּרַן' },
+    { he: 'בבקשה',      ar: 'من فضلك',      tr: 'מִן פַדְלַכּ' },
+    { he: 'בוקר טוב',   ar: 'صباح الخير',   tr: 'סַבַּאח אִלְחֵ\'יר' },
+    { he: 'איפה',       ar: 'وين',          tr: 'וֵין' },
+    { he: 'מים',        ar: 'ميّ',          tr: 'מַי' },
+    { he: 'עזרה',       ar: 'مساعدة',       tr: 'מֻסַאעַדֵה' },
+    { he: 'מסמך',       ar: 'مستند',        tr: 'מֻסְתַנַד' },
+    { he: 'חתימה',      ar: 'توقيع',        tr: 'תַוְקִיע' },
+    { he: 'פגישה',      ar: 'اجتماع',       tr: 'אִגְ\'תִמַאע' },
+    { he: 'מחר',        ar: 'بكرا',         tr: 'בֻּכְּרַא' },
+    { he: 'עכשיו',      ar: 'هلّأ',         tr: 'הַלַּא' },
+    { he: 'מהר',        ar: 'بسرعة',        tr: 'בְּסֻרְעַה' },
+    { he: 'לאט',        ar: 'شوي شوي',      tr: 'שְׁוַי שְׁוַי' },
+    { he: 'בסדר',       ar: 'تمام',         tr: 'תַמַאם' },
+    { he: 'סליחה',      ar: 'عفواً',        tr: 'עַפְוַן' },
+    { he: 'כמה',        ar: 'قدّيش',        tr: 'קַדֵּיש' },
+    { he: 'מתי',        ar: 'إيمتى',        tr: 'אֵימְתַא' },
+    { he: 'טלפון',      ar: 'تلفون',        tr: 'תִלִפוֹן' },
+    { he: 'כתובת',      ar: 'عنوان',        tr: 'עֻנְוַאן' },
+    { he: 'שם',         ar: 'اسم',          tr: 'אִסֶם' },
+    { he: 'משפחה',      ar: 'عيلة',         tr: 'עֵילֵה' },
+    { he: 'רופא',       ar: 'دكتور',        tr: 'דֻכְּתוֹר' },
+    { he: 'מכונית',     ar: 'سيّارة',       tr: 'סַיַּארַה' },
+    { he: 'דלת',        ar: 'باب',          tr: 'בַּאבּ' },
+    { he: 'מפתח',       ar: 'مفتاح',        tr: 'מִפְתַאח' },
+    { he: 'אוכל',       ar: 'أكل',          tr: 'אַכֶּל' },
+    { he: 'חשוב',       ar: 'مهمّ',         tr: 'מֻהִם' },
+    { he: 'בעיה',       ar: 'مشكلة',        tr: 'מֻשְׁכִּלֵה' },
+    { he: 'פתרון',      ar: 'حلّ',          tr: 'חַל' },
+    { he: 'להתראות',    ar: 'مع السلامة',   tr: 'מַע אִ-סַּלַאמֵה' }
+  ];
+
+  var KEY = 'arabic-words-proto-v1';
+
+  // מצב דוגמה: סבב באמצע. 8 כרטיסים נענו (6 ידעתי, 2 לא ידעתי שחזרו לתור).
+  function sampleState() {
+    var queue = [];
+    for (var i = 8; i < WORDS.length; i++) queue.push(i);
+    queue.splice(2, 0, 2);   // "בוקר טוב" חוזר אחרי 3 כרטיסים
+    queue.splice(7, 0, 5);   // "עזרה" חוזר קצת אחר כך
+    return {
+      queue: queue,
+      answered: 8,
+      marks: { 0: 'known', 1: 'known', 2: 'unknown', 3: 'known', 4: 'known', 5: 'unknown', 6: 'known', 7: 'known' },
+      missed: [2, 5],
+      flipped: false,
+      finished: false,
+      tab: 'practice'
+    };
+  }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) {
+        var s = JSON.parse(raw);
+        if (s && Array.isArray(s.queue) && s.marks) return s;
+      }
+    } catch (e) { /* אחסון חסום: ממשיכים עם נתוני הדוגמה */ }
+    return sampleState();
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* מתעלמים */ }
+  }
+
+  var state = load();
+
+  // ----- אלמנטים -----
+  var $ = function (id) { return document.getElementById(id); };
+  var card = $('card'), answerArea = $('answer-area'), practiceArea = $('practice-area'), summaryArea = $('summary-area');
+  var toastEl = $('toast'), toastTimer = null;
+
+  function el(tag, cls, text, attrs) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    if (attrs) for (var k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+  function clear(n) { while (n.firstChild) n.removeChild(n.firstChild); }
+  function toast(msg) {
+    toastEl.textContent = msg;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.textContent = ''; }, 2200);
+  }
+
+  // ----- לוגיקה -----
+  function total() { return state.answered + state.queue.length; }
+  function currentId() { return state.queue.length ? state.queue[0] : null; }
+
+  function answer(known) {
+    var id = state.queue.shift();
+    state.answered += 1;
+    state.marks[id] = known ? 'known' : 'unknown';
+    if (!known) {
+      if (state.missed.indexOf(id) === -1) state.missed.push(id);
+      // חזרה מרווחת קלה: הכרטיס חוזר אחרי 3 עד 5 כרטיסים
+      var back = 3 + Math.floor(Math.random() * 3);
+      var pos = Math.min(back, state.queue.length);
+      state.queue.splice(pos, 0, id);
+    }
+    state.flipped = false;
+    if (state.queue.length === 0) state.finished = true;
+    save();
+    render();
+  }
+
+  function startRound(ids) {
+    state.queue = ids.slice();
+    state.answered = 0;
+    state.missed = [];
+    state.flipped = false;
+    state.finished = false;
+    save();
+    render();
+  }
+
+  function shuffled(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  // ----- רינדור -----
+  function renderProgress() {
+    var t = total();
+    $('progress-text').textContent = state.answered + ' / ' + t;
+    $('progress-fill').style.width = (t ? Math.round(state.answered / t * 100) : 0) + '%';
+    $('progress-sub').textContent = state.queue.length ? 'עוד ' + state.queue.length + ' בסבב הזה' : 'הסבב הסתיים';
+  }
+
+  function renderCard() {
+    clear(card);
+    clear(answerArea);
+    var id = currentId();
+    if (id === null) return;
+    var w = WORDS[id];
+    card.classList.toggle('flipped', !!state.flipped);
+    if (!state.flipped) {
+      card.appendChild(el('span', 'eyebrow', 'בעברית'));
+      card.appendChild(el('span', 'he', w.he));
+      card.appendChild(el('span', 'hint', 'הקישו על הכרטיס כדי לראות בערבית'));
+      card.setAttribute('aria-label', 'כרטיס: ' + w.he + '. הקישו כדי להפוך');
+      var show = el('button', 'btn btn-primary btn-block', 'הצג תשובה', { type: 'button', id: 'show-btn' });
+      show.addEventListener('click', flip);
+      answerArea.appendChild(show);
+    } else {
+      card.appendChild(el('span', 'he', w.he));
+      var ar = el('span', 'ar', w.ar, { lang: 'ar', dir: 'rtl' });
+      card.appendChild(ar);
+      card.appendChild(el('span', 'tr', w.tr));
+      card.setAttribute('aria-label', w.he + ' בערבית: ' + w.ar + ', ' + w.tr);
+      var grid = el('div', 'answers');
+      var no = el('button', 'btn btn-warm', 'לא ידעתי', { type: 'button', id: 'no-btn' });
+      var yes = el('button', 'btn btn-ok', 'ידעתי', { type: 'button', id: 'yes-btn' });
+      no.addEventListener('click', function () { answer(false); toast('יחזור בעוד כמה כרטיסים'); });
+      yes.addEventListener('click', function () { answer(true); });
+      grid.appendChild(yes);
+      grid.appendChild(no);
+      answerArea.appendChild(grid);
+    }
+  }
+
+  function flip() {
+    if (currentId() === null) return;
+    state.flipped = !state.flipped;
+    save();
+    renderCard();
+  }
+
+  function renderSummary() {
+    var known = 0, unknown = state.missed.length;
+    for (var k in state.marks) if (state.marks[k] === 'known' && state.missed.indexOf(Number(k)) === -1) known++;
+    $('stat-known').textContent = known;
+    $('stat-unknown').textContent = unknown;
+    $('summary-title').textContent = state.queue.length ? 'סיימת להיום' : 'כל הכבוד, סיימת את הסבב';
+    $('summary-sub').textContent = state.answered + ' כרטיסים תורגלו בסבב הזה' +
+      (unknown ? '. המילים שסומנו "לא ידעתי":' : '. ידעת את כל המילים בסבב.');
+    var chips = $('unknown-chips');
+    clear(chips);
+    state.missed.forEach(function (id) { chips.appendChild(el('span', 'chip', WORDS[id].he)); });
+    $('retry-btn').hidden = unknown === 0;
+  }
+
+  function renderList() {
+    var ul = $('words');
+    clear(ul);
+    var knownCount = 0;
+    WORDS.forEach(function (w, i) {
+      var mark = state.marks[i] || 'none';
+      if (mark === 'known') knownCount++;
+      var li = el('li', null, null, { 'data-mark': mark });
+      li.appendChild(el('span', 'dot', null, { 'aria-hidden': 'true' }));
+      var wrap = el('div', 'w');
+      wrap.appendChild(el('span', 'he', w.he));
+      var sub = el('span', 'tr');
+      sub.appendChild(el('span', 'ar', w.ar, { lang: 'ar', dir: 'rtl' }));
+      sub.appendChild(document.createTextNode('  ' + w.tr));
+      wrap.appendChild(sub);
+      li.appendChild(wrap);
+      li.appendChild(el('span', 'mark', mark === 'known' ? 'ידעתי' : mark === 'unknown' ? 'לא ידעתי' : 'טרם'));
+      ul.appendChild(li);
+    });
+    $('list-count').textContent = knownCount + ' מתוך ' + WORDS.length + ' ידועות';
+  }
+
+  function renderTabs() {
+    var practice = state.tab !== 'list';
+    $('tab-practice').setAttribute('aria-selected', practice ? 'true' : 'false');
+    $('tab-list').setAttribute('aria-selected', practice ? 'false' : 'true');
+    $('view-practice').hidden = !practice;
+    $('view-list').hidden = practice;
+  }
+
+  function render() {
+    renderTabs();
+    renderProgress();
+    var showSummary = state.finished || state.queue.length === 0;
+    practiceArea.hidden = showSummary;
+    summaryArea.hidden = !showSummary;
+    if (showSummary) renderSummary(); else renderCard();
+    renderList();
+  }
+
+  // ----- אירועים -----
+  card.addEventListener('click', flip);
+  $('finish-btn').addEventListener('click', function () {
+    state.finished = true; state.flipped = false; save(); render();
+  });
+  $('retry-btn').addEventListener('click', function () {
+    startRound(shuffled(state.missed));
+    toast('סבב חוזר: ' + state.queue.length + ' מילים');
+  });
+  $('new-round-btn').addEventListener('click', function () {
+    var all = []; for (var i = 0; i < WORDS.length; i++) all.push(i);
+    startRound(shuffled(all));
+    toast('סבב חדש על כל 30 המילים');
+  });
+  $('tab-practice').addEventListener('click', function () { state.tab = 'practice'; save(); renderTabs(); });
+  $('tab-list').addEventListener('click', function () { state.tab = 'list'; save(); renderTabs(); });
+  $('reset-btn').addEventListener('click', function () {
+    state = sampleState();
+    try { localStorage.removeItem(KEY); } catch (e) { /* מתעלמים */ }
+    render();
+    toast('נתוני הדוגמה שוחזרו');
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

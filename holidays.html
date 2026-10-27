@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>סוגיות אסלאמיות וחגים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@400;500;700&display=swap">
+<style>
+/* פריסה: מסגרת טלפון ממורכזת (430px), תוכן גולל בפנים, טאבים ופוטר קבועים בתחתית המסגרת */
+:root {
+  --bg: #F3F4F1; --surface: #FFFFFF; --sunk: #EEF0EC; --ink: #17212B; --muted: #55606B;
+  --line: #DCE0DA; --line2: #9AA3AC; --accent: #1E4FA8; --on-accent: #FFFFFF;
+  --warm: #A9480C; --warm-soft: #FBEBDD; --on-warm: #FFFFFF; --ok: #2F6B3F; --danger: #B42318;
+  --font: Assistant, "Segoe UI", Arial, sans-serif;
+  --display: Rubik, Assistant, "Segoe UI", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12171D; --surface: #1B222A; --sunk: #151B21; --ink: #EEF1F4; --muted: #A7B0BA;
+    --line: #2C3640; --line2: #56636F; --accent: #8EB0F2; --on-accent: #0E1620;
+    --warm: #F0A464; --warm-soft: #3A2A1C; --on-warm: #1A1007; --ok: #86C79A; --danger: #FF9B8F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12171D; --surface: #1B222A; --sunk: #151B21; --ink: #EEF1F4; --muted: #A7B0BA;
+  --line: #2C3640; --line2: #56636F; --accent: #8EB0F2; --on-accent: #0E1620;
+  --warm: #F0A464; --warm-soft: #3A2A1C; --on-warm: #1A1007; --ok: #86C79A; --danger: #FF9B8F;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--sunk);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+button { font-family: inherit; font-size: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; line-height: 1.25; }
+p { margin: 0; }
+ul { margin: 0; padding-inline-start: 20px; }
+li { margin-block: 4px; }
+[lang="ar"] { font-family: var(--display); direction: rtl; }
+
+.page {
+  min-height: 100%;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.above { text-align: center; color: var(--muted); font-size: 14px; }
+.above .kicker {
+  font-family: var(--display); font-weight: 500; font-size: 13px; letter-spacing: .06em;
+  color: var(--ink);
+}
+.phone {
+  width: 100%;
+  max-width: 430px;
+  height: 100vh;
+  height: 100dvh;
+  max-height: 860px;
+  min-height: 0;
+  background: var(--bg);
+  border: 2px solid var(--line2);
+  border-radius: 32px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 480px) {
+  body { background: var(--bg); }
+  .page { padding: 0; gap: 0; min-height: 100%; }
+  .above { display: none; }
+  .phone { max-width: none; max-height: none; height: 100vh; height: 100dvh; border: 0; border-radius: 0; }
+}
+
+/* כותרת עליונה */
+.top {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  min-height: 60px;
+}
+.top h1 { font-size: 21px; font-weight: 700; flex: 1; min-width: 0; }
+.back {
+  background: none; border: 1px solid var(--line); border-radius: 999px;
+  min-height: 44px; min-width: 44px; padding: 0 12px;
+  display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 15px;
+}
+.back:hover { background: var(--sunk); }
+
+/* תוכן גולל */
+main {
+  flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.note { color: var(--muted); font-size: 14px; }
+.note strong { color: var(--ink); font-weight: 600; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.card h2 { font-size: 20px; }
+.card h3 { font-size: 16px; font-weight: 500; color: var(--muted); }
+.hero { border: 1.5px solid var(--accent); }
+.eyebrow {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+}
+.eyebrow .label {
+  font-family: var(--display); font-size: 13px; font-weight: 500; letter-spacing: .06em; color: var(--accent);
+}
+.count {
+  font-family: var(--display); font-size: 30px; font-weight: 700; line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.names { display: flex; flex-direction: column; gap: 2px; }
+.names .ar { font-size: 18px; color: var(--muted); }
+.date { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.chip {
+  display: inline-block; padding: 3px 10px; border-radius: 999px;
+  background: var(--warm-soft); color: var(--warm); font-weight: 700; font-size: 14px; white-space: nowrap;
+}
+.chip.now { background: var(--accent); color: var(--on-accent); }
+.tips { background: var(--sunk); border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; }
+.tips h3 { color: var(--ink); font-weight: 700; font-size: 16px; }
+.btn {
+  min-height: 48px; border: 0; border-radius: 999px;
+  background: var(--accent); color: var(--on-accent);
+  font-weight: 700; padding: 0 20px; width: 100%;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: var(--surface); color: var(--accent); border: 1.5px solid var(--accent); }
+
+.section-title { font-size: 15px; font-weight: 500; color: var(--muted); font-family: var(--display); }
+.list { display: flex; flex-direction: column; gap: 8px; }
+.row {
+  width: 100%; text-align: start;
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; min-height: 64px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+}
+.row:hover { border-color: var(--line2); }
+.row .names { flex: 1; min-width: 0; }
+.row .names .he { font-family: var(--display); font-weight: 500; font-size: 17px; }
+.row .names .ar { font-size: 15px; }
+.row .side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.check { color: var(--ok); font-weight: 700; font-size: 14px; white-space: nowrap; }
+
+/* דף חג */
+.greet { background: var(--warm-soft); border: 0; }
+.greet .big { font-size: 28px; font-weight: 500; color: var(--ink); }
+.greet .translit { font-weight: 700; }
+.greet .meaning { color: var(--muted); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; font-size: 15px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; }
+
+/* חידון */
+.q { display: flex; flex-direction: column; gap: 8px; }
+.q .qt { font-weight: 700; }
+.opt {
+  width: 100%; text-align: start; min-height: 48px;
+  padding: 10px 14px; border-radius: 12px;
+  background: var(--surface); border: 1.5px solid var(--line);
+}
+.opt:hover:not(:disabled) { border-color: var(--line2); }
+.opt:disabled { cursor: default; }
+.opt.correct { border-color: var(--ok); color: var(--ok); font-weight: 700; }
+.opt.wrong { border-color: var(--danger); color: var(--danger); }
+.fb { font-size: 15px; padding: 8px 12px; border-radius: 10px; background: var(--sunk); }
+.fb.good { color: var(--ok); font-weight: 600; }
+.result { text-align: center; display: flex; flex-direction: column; gap: 10px; }
+.result .score { font-family: var(--display); font-size: 26px; font-weight: 700; }
+.result .pass { color: var(--ok); }
+.result .fail { color: var(--warm); }
+
+/* מושגים */
+.term { gap: 4px; }
+.term .head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.term .head .he { font-family: var(--display); font-weight: 700; font-size: 18px; }
+.term .head .ar { font-size: 17px; color: var(--muted); }
+.term .head .tr { font-size: 14px; color: var(--muted); }
+.term p { font-size: 15px; }
+
+/* טאבים ופוטר */
+.tabs {
+  display: grid; grid-template-columns: 1fr 1fr;
+  background: var(--surface); border-top: 1px solid var(--line);
+}
+.tabs button {
+  min-height: 54px; background: none; border: 0; border-top: 3px solid transparent;
+  font-weight: 600; color: var(--muted); font-size: 16px;
+}
+.tabs button[aria-current="page"] { color: var(--accent); border-top-color: var(--accent); font-weight: 700; }
+footer {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+  padding: 6px 16px calc(6px + env(safe-area-inset-bottom, 0px));
+  background: var(--surface); border-top: 1px solid var(--line);
+  color: var(--muted); font-size: 12px; line-height: 1.35;
+}
+footer p { flex: 1; min-width: 180px; }
+.reset {
+  background: none; border: 1px solid var(--line); border-radius: 999px;
+  min-height: 44px; padding: 0 12px; font-size: 13px; color: var(--muted); white-space: nowrap;
+}
+.reset:hover { color: var(--ink); border-color: var(--line2); }
+.toast {
+  position: absolute; inset-inline: 16px; bottom: 130px;
+  background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 12px;
+  font-size: 14px; text-align: center;
+}
+.phone { position: relative; }
+@media (prefers-reduced-motion: no-preference) {
+  .opt, .row, .btn { transition: border-color .15s, filter .15s; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="above">
+    <p class="kicker">אב טיפוס להדגמה</p>
+    <p>נתוני דוגמה בלבד. שום דבר לא נשלח לשרת.</p>
+  </div>
+
+  <div class="phone">
+    <header class="top">
+      <button class="back" id="back" type="button" hidden aria-label="חזרה למסך הקודם"><span aria-hidden="true">&#x2192;</span> חזרה</button>
+      <h1 id="title">החגים הקרובים</h1>
+    </header>
+    <main id="view" aria-live="polite"></main>
+    <nav class="tabs" aria-label="ניווט ראשי">
+      <button type="button" id="tab-home" aria-current="page">החגים הקרובים</button>
+      <button type="button" id="tab-terms">מושגים</button>
+    </nav>
+    <footer>
+      <p>אב טיפוס להדגמה בסדנא. נתוני דוגמה בלבד. נבנה עם Claude, בלי לכתוב קוד.</p>
+      <button type="button" class="reset" id="reset">איפוס לדוגמה</button>
+    </footer>
+    <div class="toast" id="toast" hidden role="status"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- נתוני דוגמה ---------- */
+  var HOLIDAYS = [
+    {
+      id: 'ramadan', he: 'תחילת רמדאן', ar: 'رمضان', date: '2027-02-08', duration: 30, durationLabel: 'כחודש (29 עד 30 יום)',
+      about: 'רמדאן הוא החודש התשיעי בלוח השנה המוסלמי (ההיג\'רי), וחודש הצום. במשך כחודש, מעלות השחר ועד השקיעה, מוסלמים נמנעים מאכילה, שתייה ועישון. זהו זמן של תפילה, צדקה, קריאה בקוראן ומפגשים משפחתיים. בכל ערב שוברים את הצום בארוחת האיפטאר, ובלילות רבים מתפללים תפילת תראוויח. עשרת הלילות האחרונים נחשבים למקודשים במיוחד, ובהם לילת אל-קדר.',
+      work: [
+        'שעות הצום: מעלות השחר (סביב 5:00 בפברואר) עד השקיעה (סביב 17:30). בלי אוכל, שתייה וקפה.',
+        'מותר לאכול ליד עמית שצם, אבל כדאי לא להציע כיבוד ולא לקבוע ארוחות צוות באמצע היום.',
+        'שעות אחר הצהריים קשות יותר. אם אפשר, פגישות מאומצות בבוקר.',
+        'רבים מעדיפים לסיים את יום העבודה מוקדם כדי להגיע לאיפטאר. גמישות בשעות מתקבלת בתודה.',
+        'תחילת החודש נקבעת לפי ראיית הירח, לעיתים רק בלילה שלפני. ייתכן הבדל של יום.'
+      ],
+      customs: [
+        'סוחור: ארוחה קלה לפני עלות השחר.',
+        'איפטאר: שבירת הצום בשקיעה, לרוב בתמר ובמים, ואז ארוחה משפחתית.',
+        'תפילת תראוויח בלילות החודש במסגד.',
+        'צדקה מוגברת ומתן זכאת.',
+        'לילת אל-קדר באחד מעשרת הלילות האחרונים: תפילה עד הבוקר.'
+      ],
+      greet: { ar: 'رمضان كريم', tr: 'רמדאן כרים', meaning: 'רמדאן נדיב (שיהיה לכם חודש מבורך).', reply: 'תשובה מקובלת: "אללה אכרם" (الله أكرم), אלוהים נדיב יותר. גם "רמדאן מבארכ" מתאים.' },
+      quiz: [
+        { q: 'ממתי עד מתי נמשך הצום ביום של רמדאן?', opts: ['מעלות השחר עד השקיעה', 'מהזריחה עד חצות', '24 שעות ביממה, כל החודש'], a: 0,
+          fb: ['נכון. הצום מתחיל בעלות השחר ונשבר בשקיעה, באיפטאר.', 'לא בדיוק. הצום מתחיל לפני הזריחה, בעלות השחר, ונגמר בשקיעה.', 'לא. אוכלים ושותים בלילה, בין האיפטאר לסוחור.'] },
+        { q: 'עובד שצם מבקש לא לקבוע ארוחת צוות בצהריים. מה נכון לעשות?', opts: ['לקבוע אותה ולהגיש אוכל רק לאחרים', 'לדחות לאחרי רמדאן, או להפוך אותה לאיפטאר משותף בערב', 'לבטל את כל פגישות הצוות בחודש'], a: 1,
+          fb: ['לא מומלץ. זה משאיר אותו מחוץ לאירוע צוות.', 'נכון. איפטאר משותף הוא גם הזדמנות טובה לצוות כולו.', 'מוגזם. פגישות רגילות בסדר גמור, רק בלי אוכל.'] },
+        { q: 'איזו ברכה מתאימה לעמית בתחילת רמדאן?', opts: ['חג\' מברור', 'רמדאן כרים', 'עיד מבארכ'], a: 1,
+          fb: ['"חג\' מברור" אומרים למי שחזר מהעלייה לרגל למכה.', 'נכון. "רמדאן כרים" או "רמדאן מבארכ".', '"עיד מבארכ" שומרים לחג עצמו, בסוף החודש.'] }
+      ]
+    },
+    {
+      id: 'fitr', he: 'עיד אל-פיטר', ar: 'عيد الفطر', date: '2027-03-09', duration: 3, durationLabel: '3 ימים',
+      about: 'עיד אל-פיטר, חג שבירת הצום, מציין את סיום חודש רמדאן ונחגג בראשון לחודש שוואל. החג נפתח בתפילת בוקר משותפת, ולפניה נותנים זכאת אל-פיטר, צדקה לנזקקים כדי שגם הם יוכלו לחגוג. לובשים בגדים חדשים, מבקרים הורים וקרובים, מגישים מאפים מתוקים כמו כעכ ומעמול, והילדים מקבלים דמי חג (עידיה). החג נמשך בדרך כלל שלושה ימים, והיום הראשון הוא החשוב ביותר.',
+      work: [
+        'רוב העובדים ייקחו יום עד שלושה ימי חופש. היום הראשון כמעט תמיד.',
+        'התאריך המדויק נקבע לפי ראיית הירח, לפעמים רק בערב שלפני. כדאי להשאיר גמישות של יום.',
+        'לא לקבוע דדליינים, השקות או הדרכות ביומיים הראשונים של החג.',
+        'ברכה: "עיד מבארכ" או "כל עאם ואנתם בח\'יר".',
+        'עובדים שחוזרים מהחג מביאים לפעמים ממתקים לצוות. תודה קטנה מתקבלת יפה.'
+      ],
+      customs: [
+        'תפילת העיד בבוקר החג, במסגד או במגרש פתוח.',
+        'זכאת אל-פיטר: צדקה שנותנים לפני התפילה.',
+        'בגדים חדשים וביקורים אצל ההורים ואז אצל הקרובים.',
+        'עידיה: דמי חג לילדים.',
+        'כעכ ומעמול, מאפים ממולאים בתמרים או באגוזים.'
+      ],
+      greet: { ar: 'عيد مبارك', tr: 'עיד מבארכ', meaning: 'חג מבורך.', reply: 'תשובה מקובלת: "אללה יבארכ פיכ" (الله يبارك فيك), שאלוהים יברך אותך. ברכה נוספת: "כל עאם ואנתם בח\'יר".' },
+      quiz: [
+        { q: 'מה מציין עיד אל-פיטר?', opts: ['את סיום צום רמדאן', 'את תחילת העלייה לרגל', 'את ראש השנה ההיג\'רית'], a: 0,
+          fb: ['נכון. "פיטר" פירושו שבירת הצום.', 'לא. העלייה לרגל קשורה לעיד אל-אדחא, כחודשיים אחר כך.', 'לא. ראש השנה ההיג\'רית הוא בחודש מוחרם.'] },
+        { q: 'מתי יודעים בוודאות שהחג מתחיל?', opts: ['שנה מראש, לפי לוח קבוע', 'בדרך כלל רק בערב שלפני, לפי ראיית הירח', 'רק בבוקר החג עצמו'], a: 1,
+          fb: ['לא. התאריכים בלוח הם הערכה בלבד.', 'נכון. לכן כדאי להשאיר גמישות של יום בתכנון.', 'לא. ההכרזה נעשית בערב, אחרי ראיית הירח.'] },
+        { q: 'כמה ימי חופש סביר שעובד יבקש לעיד אל-פיטר?', opts: ['יום עד שלושה ימים', 'שבועיים', 'אף יום, זה לא חג משמעותי'], a: 0,
+          fb: ['נכון. היום הראשון הוא החשוב ביותר.', 'לא. החג נמשך שלושה ימים.', 'לא. זה אחד משני החגים הגדולים בשנה.'] }
+      ]
+    },
+    {
+      id: 'adha', he: 'עיד אל-אדחא', ar: 'عيد الأضحى', date: '2027-05-16', duration: 4, durationLabel: '4 ימים',
+      about: 'עיד אל-אדחא, חג הקורבן, הוא החג הגדול בלוח השנה המוסלמי. הוא חל בעשירי לחודש ד\'ו אל-חיג\'ה, בשיא העלייה לרגל למכה (החג\'), ונחגג גם על ידי מי שלא עלה לרגל. החג מציין את נכונותו של אברהם (איבראהים) להקריב את בנו, ואת החלפת הבן באיל. משפחות רבות שוחטות כבש ומחלקות את הבשר לשלושה חלקים: למשפחה, לקרובים ולנזקקים. החג נמשך ארבעה ימים ומלווה בביקורים, בארוחות ובבגדים חדשים.',
+      work: [
+        'החג נמשך ארבעה ימים. סביר שעובדים ייקחו שניים עד ארבעה ימי חופש.',
+        'יום ערפה, היום שלפני החג, הוא יום צום רשות ורבים צמים בו.',
+        'עובדים שעולים לרגל (חג\') נעדרים שבועיים עד שלושה, ויודעים על כך חודשים מראש. כדאי לתאם מוקדם.',
+        'ברכה: "עיד מבארכ" או "עיד אדחא מבארכ".',
+        'לא לקבוע אירועי צוות ביום הראשון. רוב העובדים יהיו עם המשפחה.'
+      ],
+      customs: [
+        'תפילת העיד בבוקר.',
+        'אודחיה: שחיטת כבש וחלוקת הבשר למשפחה, לקרובים ולנזקקים.',
+        'ביקורים משפחתיים וארוחות בשר.',
+        'צום רשות ביום ערפה, יום לפני החג.',
+        'קבלת פנים חגיגית לעולי הרגל שחוזרים ממכה.'
+      ],
+      greet: { ar: 'عيد أضحى مبارك', tr: 'עיד אדחא מבארכ', meaning: 'חג קורבן מבורך.', reply: 'למי שחזר מהחג\': "חג\' מברור" (حج مبرور), שהעלייה לרגל תתקבל.' },
+      quiz: [
+        { q: 'למה קוראים לחג "חג הקורבן"?', opts: ['לזכר נכונות אברהם להקריב את בנו, והאיל שהוחלף בו', 'לזכר קורבנות של מלחמה עתיקה', 'כי נהוג לצום בו שבוע'], a: 0,
+          fb: ['נכון. זה הסיפור שבמרכז החג.', 'לא. החג קשור לסיפור אברהם ובנו.', 'לא. בחג עצמו לא צמים, אלא אוכלים יחד.'] },
+        { q: 'מה עושים עם בשר הקורבן?', opts: ['מוכרים אותו בשוק', 'מחלקים למשפחה, לקרובים ולנזקקים', 'שומרים אותו לרמדאן'], a: 1,
+          fb: ['לא. המנהג הוא לחלק, לא למכור.', 'נכון. שליש לכל אחד מהשלושה.', 'לא. רמדאן הוא חודש צום, חודשים לפני כן.'] },
+        { q: 'עובד מודיע שהוא יוצא לחג\'. כמה זמן סביר שייעדר?', opts: ['יום אחד', 'שבועיים עד שלושה', 'חצי שנה'], a: 1,
+          fb: ['לא. מדובר בנסיעה למכה עם טקסים של כמה ימים.', 'נכון. וכמעט תמיד יודעים על כך חודשים מראש.', 'לא. העלייה לרגל עצמה נמשכת כשבוע.'] }
+      ]
+    },
+    {
+      id: 'hijri', he: 'ראש השנה ההיג\'רית', ar: 'رأس السنة الهجرية', date: '2027-06-06', duration: 1, durationLabel: 'יום אחד',
+      about: 'ראש השנה ההיג\'רית חל בראשון לחודש מוחרם, החודש הראשון בלוח השנה המוסלמי. הלוח מתחיל בשנת ההיג\'רה, מעברו של הנביא מוחמד ממכה למדינה בשנת 622 לספירה. בניגוד לראש השנה האזרחי, זהו יום שקט יחסית: אין בו טקסים מחייבים, ורבים מציינים אותו בתפילה, בלימוד ובסיכום השנה. ביוני 2027 מתחילה שנת 1449 להיג\'רה.',
+      work: [
+        'יום אחד, בדרך כלל שקט. חלק מהעובדים ייקחו יום חופש וחלק לא.',
+        'מוחרם הוא חודש מכובד, ויש הנמנעים בו מחגיגות גדולות.',
+        'ברכה קצרה: "כל עאם ואנתם בח\'יר". היא מתאימה לכל חג.',
+        'הזדמנות לעדכן את לוח החגים של הצוות: החגים המוסלמיים זזים כ-11 ימים אחורה בכל שנה אזרחית.'
+      ],
+      customs: [
+        'תפילה במסגד ולימוד סיפור ההיג\'רה.',
+        'ארוחה משפחתית שקטה.',
+        'יש הצמים בימים הראשונים של מוחרם.',
+        'אין מתנות או קישוטים, בניגוד לשני החגים הגדולים.'
+      ],
+      greet: { ar: 'كل عام وأنتم بخير', tr: 'כל עאם ואנתם בח\'יר', meaning: 'שתהיו בטוב בכל שנה.', reply: 'תשובה מקובלת: "ואנתם בח\'יר" (وأنتم بخير), וגם אתם בטוב.' },
+      quiz: [
+        { q: 'מה מציין ראש השנה ההיג\'רית?', opts: ['את לידת הנביא מוחמד', 'את מעבר הנביא מוחמד ממכה למדינה', 'את סיום העלייה לרגל'], a: 1,
+          fb: ['לא. לידת הנביא מצוינת במולד א-נבי.', 'נכון. "היג\'רה" פירושה הגירה, ומשם מתחיל הלוח.', 'לא. העלייה לרגל מסתיימת בעיד אל-אדחא.'] },
+        { q: 'בכמה זזים חגי האסלאם בכל שנה אזרחית?', opts: ['כ-11 ימים אחורה', 'הם קבועים בתאריך לועזי', 'כ-30 ימים קדימה'], a: 0,
+          fb: ['נכון. שנת ירח קצרה בכ-11 ימים משנת שמש.', 'לא. הלוח הוא לוח ירח, ולכן התאריכים נודדים.', 'לא. הם זזים אחורה, לא קדימה.'] },
+        { q: 'איך מציינים ראש השנה ההיג\'רית ברוב הבתים?', opts: ['בזיקוקים ובמסיבות עד חצות', 'באופן שקט, בתפילה ובארוחה משפחתית', 'בצום חובה של יומיים'], a: 1,
+          fb: ['לא. זה יום שקט, לא חגיגה רועשת.', 'נכון. זה יום של התחלה והתבוננות.', 'לא. הצום במוחרם הוא רשות, ולא ביום הראשון דווקא.'] }
+      ]
+    },
+    {
+      id: 'ashura', he: 'עאשוראא', ar: 'عاشوراء', date: '2027-06-15', duration: 1, durationLabel: 'יום אחד',
+      about: 'עאשוראא הוא היום העשירי בחודש מוחרם. ברוב הקהילות המוסלמיות (הסוניות) זהו יום צום רשות, לזכר הצלת משה (מוסא) ובני ישראל מפרעה, ומקובל לצום גם ביום שלפניו. בקהילות שיעיות זהו יום אבל על מות חוסיין, נכדו של הנביא, בקרב כרבלאא. זהו לא חג חגיגי, ולרוב לא יום חופש.',
+      work: [
+        'חלק מהעובדים צמים ביום הזה, ולפעמים גם ביום שלפניו. אותן התחשבויות כמו ברמדאן, ליום או יומיים.',
+        'לא יום חופש ברוב מקומות העבודה, אבל ייתכנו בקשות לסיים מוקדם.',
+        'אין ברכת חג מקובלת. למי שצם אפשר לומר "תקבל אללה" (שהצום יתקבל).',
+        'עובדים שיעים עשויים לבקש את היום כיום אבל. כדאי לשאול, לא להניח.'
+      ],
+      customs: [
+        'צום רשות בתשיעי ובעשירי במוחרם.',
+        'תפילה וצדקה.',
+        'בחלק מהבתים: ארוחת ערב משפחתית אחרי הצום.',
+        'בקהילות שיעיות: ימי אבל ותהלוכות זיכרון.'
+      ],
+      greet: { ar: 'تقبل الله', tr: 'תקבל אללה', meaning: 'שאלוהים יקבל (את הצום). זו לא ברכת חג, אלא איחול למי שצם.', reply: 'תשובה מקובלת: "מנא ומנכם" (منا ومنكم), מאיתנו ומכם.' },
+      quiz: [
+        { q: 'מה עושים רוב המוסלמים (הסונים) בעאשוראא?', opts: ['צום רשות', 'חוגגים עם מתנות', 'נמנעים מעבודה לשבוע'], a: 0,
+          fb: ['נכון. צום רשות, לרוב גם ביום שלפני.', 'לא. זה לא יום חגיגי.', 'לא. רוב האנשים עובדים כרגיל.'] },
+        { q: 'האם עאשוראא הוא יום חופש מקובל?', opts: ['כן, שלושה ימים', 'בדרך כלל לא. ייתכנו צום ובקשות לסיים מוקדם', 'כן, יום מנוחה חובה'], a: 1,
+          fb: ['לא. זה יום אחד, ולרוב יום עבודה.', 'נכון. חשוב בעיקר להתחשב במי שצם.', 'לא. אין חובת מנוחה ביום הזה.'] },
+        { q: 'מה מתאים לומר לעמית שצם בעאשוראא?', opts: ['עיד מבארכ', 'תקבל אללה', 'מזל טוב'], a: 1,
+          fb: ['לא. "עיד מבארכ" היא ברכת חג, וזה לא חג.', 'נכון. איחול שהצום יתקבל.', 'לא. אין כאן אירוע משמח לברך עליו.'] }
+      ]
+    },
+    {
+      id: 'mawlid', he: 'מולד א-נבי', ar: 'المولد النبوي', date: '2027-08-15', duration: 1, durationLabel: 'יום אחד',
+      about: 'מולד א-נבי הוא יום הולדתו של הנביא מוחמד, המצוין ב-12 לחודש רביע אל-אוול. במקומות רבים מציינים אותו בשירי הלל (אנאשיד), בסיפורים על חיי הנביא, בחלוקת ממתקים ובתאורה חגיגית של מסגדים ורחובות. ציון היום שנוי במחלוקת: חלק מהמוסלמים אינם מציינים אותו כלל, מפני שאינו נזכר במסורת המוקדמת. לכן ההשתתפות משתנה בין אנשים ובין משפחות.',
+      work: [
+        'חלק מהעובדים ייקחו יום חופש וחלק לא. לא להניח שכולם מציינים.',
+        'ברכה כללית שמתאימה גם למי שלא חוגג: "כל עאם ואנתם בח\'יר".',
+        'יום שקט יחסית, ללא צום. אין מגבלות אוכל.',
+        'לא לארגן אירוע מולד בעבודה ביוזמת ההנהלה. עדיף לתת לעובדים להוביל אם ירצו.'
+      ],
+      customs: [
+        'אנאשיד: שירי הלל לנביא.',
+        'דרשות וסיפורים על חיי הנביא.',
+        'חלאוות אל-מולד: ממתקים שמחלקים לילדים ולשכנים.',
+        'תאורה חגיגית במסגדים.',
+        'צדקה.'
+      ],
+      greet: { ar: 'كل عام وأنتم بخير', tr: 'כל עאם ואנתם בח\'יר', meaning: 'שתהיו בטוב בכל שנה.', reply: 'תשובה מקובלת: "ואנתם בח\'יר" (وأنتم بخير). למי שלא מציין את היום, פשוט לא לברך.' },
+      quiz: [
+        { q: 'מה מציין מולד א-נבי?', opts: ['את לידת הנביא מוחמד', 'את סיום רמדאן', 'את תחילת השנה ההיג\'רית'], a: 0,
+          fb: ['נכון. "מולד" פירושו לידה.', 'לא. סיום רמדאן הוא עיד אל-פיטר.', 'לא. השנה ההיג\'רית מתחילה במוחרם.'] },
+        { q: 'האם כל המוסלמים מציינים את המולד?', opts: ['כן, זה חג חובה', 'לא. יש מי שמציינים ויש מי שלא, מטעמים דתיים', 'רק ילדים'], a: 1,
+          fb: ['לא. זה לא אחד משני החגים המחייבים.', 'נכון. לכן כדאי לשאול ולא להניח.', 'לא. ההבדל הוא בין משפחות וזרמים, לא בין גילים.'] },
+        { q: 'מה נהוג ביום המולד?', opts: ['צום מלא', 'שירי הלל, סיפורים על הנביא וממתקים', 'שחיטת כבש'], a: 1,
+          fb: ['לא. אין צום ביום הזה.', 'נכון. יום של שירה, סיפור ומתיקות.', 'לא. שחיטת הקורבן שייכת לעיד אל-אדחא.'] }
+      ]
+    }
+  ];
+
+  var TERMS = [
+    { he: 'רמדאן', ar: 'رمضان', tr: 'ramadan', text: 'חודש הצום, התשיעי בלוח ההיג\'רי. צום מעלות השחר עד השקיעה במשך כחודש, עם דגש על תפילה, צדקה ומשפחה.' },
+    { he: 'איפטאר', ar: 'إفطار', tr: 'iftar', text: 'ארוחת שבירת הצום בשקיעה. נפתחת לרוב בתמר ובמים, ולעיתים מזמינים אליה גם עמיתים שאינם מוסלמים.' },
+    { he: 'סוחור', ar: 'سحور', tr: 'suhur', text: 'הארוחה שלפני עלות השחר ברמדאן. מסבירה למה עמית שצם ער מוקדם מאוד ועייף יותר אחר הצהריים.' },
+    { he: 'זכאת', ar: 'زكاة', tr: 'zakat', text: 'צדקה חובה, אחד מחמשת עמודי האסלאם: כ-2.5% מהחיסכון השנתי לנזקקים. זכאת אל-פיטר ניתנת לפני עיד אל-פיטר.' },
+    { he: 'חג\'', ar: 'حج', tr: 'hajj', text: 'העלייה לרגל למכה, פעם בחיים למי שיכול. הטקסים נמשכים כשבוע בחודש ד\'ו אל-חיג\'ה, וההיעדרות מהעבודה שבועיים עד שלושה.' },
+    { he: 'עומרה', ar: 'عمرة', tr: 'umrah', text: 'עלייה לרגל קצרה למכה שאפשר לקיים בכל ימות השנה. נפוצה במיוחד ברמדאן, ונמשכת בדרך כלל שבוע עד עשרה ימים.' },
+    { he: 'עיד', ar: 'عيد', tr: 'eid', text: 'חג. שני החגים המרכזיים: עיד אל-פיטר אחרי רמדאן ועיד אל-אדחא בזמן החג\'. הברכה "עיד מבארכ" מתאימה לשניהם.' },
+    { he: 'ג\'ומעה', ar: 'جمعة', tr: 'jumu\'a', text: 'יום שישי, ותפילת הצהריים המשותפת במסגד. רבים יבקשו הפסקה ארוכה יותר בין 12:00 ל-13:30 בימי שישי.' },
+    { he: 'חלאל', ar: 'حلال', tr: 'halal', text: 'מותר. בהקשר של אוכל: בשר שנשחט לפי ההלכה המוסלמית, ובלי חזיר ואלכוהול. חשוב לזכור בכיבוד ובאירועי צוות.' },
+    { he: 'מסגד', ar: 'مسجد', tr: 'masjid', text: 'בית התפילה המוסלמי. בעבודה מספיק לרוב חדר שקט ונקי לתפילה. כל אחת מחמש התפילות היומיות אורכת דקות ספורות.' }
+  ];
+
+  /* ---------- תאריכים ---------- */
+  var TODAY = new Date(); TODAY.setHours(0, 0, 0, 0);
+  var HIJRI_YEAR_DAYS = 354;
+  var fmt = new Intl.DateTimeFormat('he-IL', { day: 'numeric', month: 'long', year: 'numeric' });
+  var fmtShort = new Intl.DateTimeFormat('he-IL', { day: 'numeric', month: 'short' });
+
+  function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
+  function parseDate(s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+
+  function resolved() {
+    return HOLIDAYS.map(function (h) {
+      var d = parseDate(h.date);
+      var rolled = false;
+      while (daysBetween(TODAY, d) + h.duration <= 0) { d.setDate(d.getDate() + HIJRI_YEAR_DAYS); rolled = true; }
+      return { h: h, start: d, days: daysBetween(TODAY, d), rolled: rolled };
+    }).sort(function (a, b) { return a.start - b.start; });
+  }
+  function relLabel(r) {
+    if (r.days < 0) return 'מתקיים עכשיו';
+    if (r.days === 0) return 'היום';
+    if (r.days === 1) return 'מחר';
+    if (r.days === 2) return 'מחרתיים';
+    return 'בעוד ' + r.days + ' ימים';
+  }
+  function heroLabel(r) {
+    if (r.days < 0) return 'מתקיים עכשיו, יום ' + (1 - r.days) + ' מתוך ' + r.h.duration;
+    return relLabel(r);
+  }
+
+  /* ---------- מצב ---------- */
+  var KEY = 'proto-holidays-v1';
+  var state = { tab: 'home', passed: {} };
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) { var s = JSON.parse(raw); if (s && typeof s === 'object') { state.tab = s.tab === 'terms' ? 'terms' : 'home'; state.passed = s.passed || {}; } }
+    } catch (e) { /* אחסון חסום: עובדים בזיכרון בלבד */ }
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* מתעלמים */ }
+  }
+
+  /* ---------- בניית DOM ---------- */
+  function el(tag, attrs) {
+    var n = document.createElement(tag);
+    if (attrs) {
+      Object.keys(attrs).forEach(function (k) {
+        if (k === 'class') n.className = attrs[k];
+        else if (k === 'text') n.textContent = attrs[k];
+        else if (k.indexOf('on') === 0) n.addEventListener(k.slice(2), attrs[k]);
+        else n.setAttribute(k, attrs[k]);
+      });
+    }
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c == null) continue;
+      n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+    }
+    return n;
+  }
+  function ulOf(items) {
+    var u = el('ul');
+    items.forEach(function (t) { u.appendChild(el('li', { text: t })); });
+    return u;
+  }
+
+  var view = document.getElementById('view');
+  var titleEl = document.getElementById('title');
+  var backBtn = document.getElementById('back');
+  var tabHome = document.getElementById('tab-home');
+  var tabTerms = document.getElementById('tab-terms');
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+
+  function toast(msg) {
+    toastEl.textContent = msg; toastEl.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.hidden = true; }, 2200);
+  }
+
+  function setChrome(title, showBack, tab) {
+    titleEl.textContent = title;
+    backBtn.hidden = !showBack;
+    tabHome.setAttribute('aria-current', tab === 'home' ? 'page' : 'false');
+    tabTerms.setAttribute('aria-current', tab === 'terms' ? 'page' : 'false');
+    view.replaceChildren();
+    view.scrollTop = 0;
+  }
+
+  /* ---------- מסך הבית ---------- */
+  function renderHome() {
+    setChrome('החגים הקרובים', false, 'home');
+    var list = resolved();
+    var first = list[0];
+    var anyRolled = list.some(function (r) { return r.rolled; });
+
+    view.appendChild(el('p', { class: 'note' },
+      el('strong', { text: 'היום: ' + fmt.format(TODAY) + '. ' }),
+      'תאריכים משוערים, נקבעים לפי ראיית הירח.' + (anyRolled ? ' חגים שעברו הוזזו לשנה ההיג\'רית הבאה.' : '')));
+
+    var hero = el('div', { class: 'card hero' },
+      el('div', { class: 'eyebrow' },
+        el('span', { class: 'label', text: first.days < 0 ? 'עכשיו' : 'החג הבא' }),
+        state.passed[first.h.id] ? el('span', { class: 'check', text: '✓ עברתם את החידון' }) : null),
+      el('p', { class: 'count', text: heroLabel(first) }),
+      el('div', { class: 'names' },
+        el('h2', { text: first.h.he }),
+        el('span', { class: 'ar', lang: 'ar', text: first.h.ar })),
+      el('p', { class: 'date', text: fmt.format(first.start) + ' (משוער) · ' + first.h.durationLabel }),
+      el('p', { text: first.h.about }),
+      el('div', { class: 'tips' },
+        el('h3', { text: 'מה כדאי לדעת בעבודה' }),
+        ulOf(first.h.work.slice(0, 3))),
+      el('button', { class: 'btn', type: 'button', onclick: function () { renderHoliday(first.h.id); } }, 'לדף החג ולחידון')
+    );
+    view.appendChild(hero);
+
+    if (list.length > 1) {
+      view.appendChild(el('p', { class: 'section-title', text: 'אחר כך' }));
+      var ul = el('div', { class: 'list' });
+      list.slice(1).forEach(function (r) {
+        var side = el('div', { class: 'side' },
+          el('span', { class: 'chip' + (r.days < 0 ? ' now' : ''), text: relLabel(r) }),
+          el('span', { class: 'date', text: fmtShort.format(r.start) }));
+        var names = el('div', { class: 'names' },
+          el('span', { class: 'he', text: r.h.he }),
+          el('span', { class: 'ar', lang: 'ar', text: r.h.ar }),
+          state.passed[r.h.id] ? el('span', { class: 'check', text: '✓ החידון עבר' }) : null);
+        ul.appendChild(el('button', { class: 'row', type: 'button', onclick: (function (id) { return function () { renderHoliday(id); }; })(r.h.id) }, names, side));
+      });
+      view.appendChild(ul);
+    }
+  }
+
+  /* ---------- דף חג ---------- */
+  function renderHoliday(id) {
+    var r = resolved().filter(function (x) { return x.h.id === id; })[0];
+    if (!r) { renderHome(); return; }
+    var h = r.h;
+    setChrome(h.he, true, 'home');
+
+    view.appendChild(el('div', { class: 'card' },
+      el('div', { class: 'eyebrow' },
+        el('span', { class: 'ar', lang: 'ar', style: 'font-size:22px', text: h.ar }),
+        el('span', { class: 'chip' + (r.days < 0 ? ' now' : ''), text: relLabel(r) })),
+      el('p', { class: 'date', text: fmt.format(r.start) + ' (משוער) · ' + h.durationLabel }),
+      state.passed[id] ? el('p', { class: 'check', text: '✓ עברתם את החידון של החג הזה' }) : null
+    ));
+
+    view.appendChild(el('div', { class: 'card' },
+      el('h3', { text: 'מה זה' }),
+      el('p', { text: h.about })));
+
+    view.appendChild(el('div', { class: 'card' },
+      el('h3', { text: 'מנהגים' }),
+      ulOf(h.customs)));
+
+    view.appendChild(el('div', { class: 'card' },
+      el('h3', { text: 'מה כדאי לדעת בעבודה' }),
+      ulOf(h.work)));
+
+    view.appendChild(el('div', { class: 'card greet' },
+      el('h3', { text: 'ברכה מקובלת' }),
+      el('p', { class: 'big', lang: 'ar', text: h.greet.ar }),
+      el('p', { class: 'translit', text: h.greet.tr }),
+      el('p', { class: 'meaning', text: h.greet.meaning }),
+      el('p', { class: 'meaning', text: h.greet.reply })));
+
+    view.appendChild(renderQuiz(h));
+  }
+
+  function renderQuiz(h) {
+    var card = el('div', { class: 'card' });
+    var answers = [];
+    function build() {
+      card.replaceChildren();
+      card.appendChild(el('h3', { text: 'חידון קצר: 3 שאלות' }));
+      h.quiz.forEach(function (q, qi) {
+        var block = el('div', { class: 'q' });
+        block.appendChild(el('p', { class: 'qt', text: (qi + 1) + '. ' + q.q }));
+        var fb = el('p', { class: 'fb', hidden: '' });
+        var buttons = [];
+        q.opts.forEach(function (o, oi) {
+          var b = el('button', { class: 'opt', type: 'button', text: o });
+          b.addEventListener('click', function () {
+            if (answers[qi] !== undefined) return;
+            answers[qi] = oi;
+            var good = oi === q.a;
+            buttons.forEach(function (bb, i) {
+              bb.disabled = true;
+              if (i === q.a) bb.classList.add('correct');
+              else if (i === oi) bb.classList.add('wrong');
+            });
+            fb.textContent = q.fb[oi];
+            fb.className = 'fb' + (good ? ' good' : '');
+            fb.hidden = false;
+            if (answers.filter(function (x) { return x !== undefined; }).length === h.quiz.length) finish();
+          });
+          buttons.push(b);
+          block.appendChild(b);
+        });
+        block.appendChild(fb);
+        card.appendChild(block);
+      });
+    }
+    function finish() {
+      var score = answers.reduce(function (s, a, i) { return s + (a === h.quiz[i].a ? 1 : 0); }, 0);
+      var passed = score >= 2;
+      var res = el('div', { class: 'result' });
+      res.appendChild(el('p', { class: 'score ' + (passed ? 'pass' : 'fail'), text: score + ' מתוך 3' }));
+      if (passed) {
+        state.passed[h.id] = true; save();
+        res.appendChild(el('p', { text: '✓ עברתם. החג סומן כנלמד ברשימת החגים.' }));
+      } else {
+        res.appendChild(el('p', { text: 'כמעט. צריך לפחות 2 תשובות נכונות. קראו שוב את הדף ונסו שנית.' }));
+      }
+      res.appendChild(el('button', { class: 'btn ghost', type: 'button', onclick: function () { answers = []; build(); card.scrollIntoView({ block: 'start' }); } }, 'לנסות שוב'));
+      res.appendChild(el('button', { class: 'btn', type: 'button', onclick: renderHome }, 'חזרה לחגים הקרובים'));
+      card.appendChild(res);
+    }
+    build();
+    return card;
+  }
+
+  /* ---------- מושגים ---------- */
+  function renderTerms() {
+    setChrome('מושגים', false, 'terms');
+    view.appendChild(el('p', { class: 'note', text: TERMS.length + ' מושגים שעובדים נתקלים בהם בעבודה היומיומית. בערבית, בתעתיק ובשתי שורות הסבר.' }));
+    TERMS.forEach(function (t) {
+      view.appendChild(el('div', { class: 'card term' },
+        el('div', { class: 'head' },
+          el('span', { class: 'he', text: t.he }),
+          el('span', { class: 'ar', lang: 'ar', text: t.ar }),
+          el('span', { class: 'tr', text: t.tr })),
+        el('p', { text: t.text })));
+    });
+  }
+
+  /* ---------- ניווט ---------- */
+  function go(tab) { state.tab = tab; save(); if (tab === 'terms') renderTerms(); else renderHome(); }
+  tabHome.addEventListener('click', function () { go('home'); });
+  tabTerms.addEventListener('click', function () { go('terms'); });
+  backBtn.addEventListener('click', function () { go('home'); });
+  document.getElementById('reset').addEventListener('click', function () {
+    state = { tab: 'home', passed: {} };
+    try { localStorage.removeItem(KEY); } catch (e) { /* מתעלמים */ }
+    renderHome();
+    toast('אופס לנתוני הדוגמה');
+  });
+
+  load();
+  go(state.tab);
+})();
+</script>
+</body>
+</html>

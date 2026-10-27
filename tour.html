@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>סיור לגיבוש ענפי</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;700&display=swap">
+<style>
+  /* פריסה: מסגרת טלפון ממורכזת, כותרת דביקה עם סטפר, כרטיס תחנה אחד במרכז, פוטר קבוע */
+  :root {
+    --bg: #F3F4F1; --surface: #FFFFFF; --sunk: #EEF0EC; --ink: #17212B; --muted: #55606B;
+    --line: #DCE0DA; --line2: #9AA3AC; --accent: #1E4FA8; --on-accent: #FFFFFF;
+    --warm: #A9480C; --warm-soft: #FBEBDD; --on-warm: #FFFFFF; --ok: #2F6B3F; --danger: #B42318;
+    --font: Assistant, "Segoe UI", Arial, sans-serif;
+    --display: Rubik, Assistant, "Segoe UI", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12171D; --surface: #1B222A; --sunk: #151B21; --ink: #EEF1F4; --muted: #A7B0BA;
+      --line: #2C3640; --line2: #56636F; --accent: #8EB0F2; --on-accent: #0E1620;
+      --warm: #F0A464; --warm-soft: #3A2A1C; --on-warm: #1A1007; --ok: #86C79A; --danger: #FF9B8F;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12171D; --surface: #1B222A; --sunk: #151B21; --ink: #EEF1F4; --muted: #A7B0BA;
+    --line: #2C3640; --line2: #56636F; --accent: #8EB0F2; --on-accent: #0E1620;
+    --warm: #F0A464; --warm-soft: #3A2A1C; --on-warm: #1A1007; --ok: #86C79A; --danger: #FF9B8F;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--sunk);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .page {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-block: 24px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .page-head { text-align: center; margin-bottom: 14px; }
+  .page-head h1 { font: 500 14px/1.3 var(--display); margin: 0; color: var(--muted); letter-spacing: .02em; }
+  .page-head p { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+
+  .phone {
+    width: 100%;
+    max-width: 430px;
+    min-height: 780px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 30px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  @media (max-width: 480px) {
+    body { background: var(--bg); }
+    .page { padding: 0; min-height: 100%; }
+    .page-head { display: none; }
+    .phone { max-width: none; min-height: 100%; border: 0; border-radius: 0; flex: 1; }
+  }
+
+  /* כותרת */
+  .top {
+    position: sticky; top: 0; z-index: 2;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 16px 12px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .top-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .top h2 { font: 700 20px/1.2 var(--display); margin: 0; text-wrap: balance; }
+  .top .sub { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+  .switch {
+    display: inline-flex; align-items: center; gap: 8px;
+    min-height: 44px; padding: 0 4px;
+    background: none; border: 0; color: var(--ink); font-weight: 600; font-size: 14px;
+    white-space: nowrap;
+  }
+  .switch .knob {
+    width: 40px; height: 24px; border-radius: 12px; background: var(--line2);
+    position: relative; transition: background .15s;
+  }
+  .switch .knob::after {
+    content: ""; position: absolute; top: 3px; right: 3px; width: 18px; height: 18px;
+    border-radius: 50%; background: var(--surface); transition: transform .15s;
+  }
+  .switch[aria-checked="true"] .knob { background: var(--accent); }
+  .switch[aria-checked="true"] .knob::after { transform: translateX(-16px); }
+
+  .progress { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; color: var(--muted); }
+  .progress strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  /* סטפר */
+  .stepper { display: flex; align-items: center; justify-content: space-between; }
+  .stepper .seg { flex: 1; height: 2px; background: var(--line); }
+  .stepper .seg.done { background: var(--ok); }
+  .dot {
+    flex: 0 0 auto;
+    width: 44px; height: 44px; padding: 0;
+    background: none; border: 0;
+    display: grid; place-items: center;
+  }
+  .dot span {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: grid; place-items: center;
+    font: 600 14px/1 var(--display);
+    font-variant-numeric: tabular-nums;
+    border: 2px solid var(--line2);
+    color: var(--muted);
+    background: var(--surface);
+  }
+  .dot.done span { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .dot.current span { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .dot.viewing span { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--accent); }
+  .dot svg { width: 16px; height: 16px; }
+
+  /* גוף */
+  .main { flex: 1; padding: 16px 16px 20px; display: flex; flex-direction: column; gap: 14px; }
+
+  .notice {
+    background: var(--warm-soft); color: var(--ink);
+    border-radius: 12px; padding: 10px 14px; font-size: 15px;
+    display: flex; gap: 10px; align-items: center;
+  }
+  .notice::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--warm); flex: 0 0 auto; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 18px 16px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .card .eyebrow { font-size: 13px; color: var(--muted); letter-spacing: .04em; display: flex; align-items: center; gap: 8px; }
+  .badge {
+    display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600;
+    background: var(--sunk); color: var(--ok); border: 1px solid var(--line);
+  }
+  .card h3 { font: 700 24px/1.2 var(--display); margin: 0; text-wrap: balance; }
+  .card p { margin: 0; }
+  .task {
+    background: var(--warm-soft);
+    border-radius: 14px;
+    padding: 14px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .task .label { font: 700 14px/1.2 var(--display); color: var(--warm); }
+  .tip { display: flex; gap: 8px; color: var(--muted); font-size: 15px; }
+  .tip .label { font-weight: 700; color: var(--ink); flex: 0 0 auto; }
+
+  .btn {
+    min-height: 48px; border-radius: 999px; padding: 10px 20px;
+    border: 1px solid var(--line2); background: var(--surface); color: var(--ink);
+    font-weight: 700; font-size: 17px; width: 100%;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .btn.small { min-height: 44px; font-size: 15px; width: auto; padding: 8px 16px; }
+  .btn.text { border: 0; background: none; color: var(--muted); font-weight: 600; font-size: 14px; min-height: 44px; width: auto; }
+  .card.past { background: var(--sunk); }
+  .card.past h3 { color: var(--muted); }
+
+  /* מסך סיום */
+  .finish { text-align: center; gap: 16px; }
+  .finish .big { font: 700 28px/1.2 var(--display); margin: 0; }
+  .finish .circle {
+    width: 64px; height: 64px; border-radius: 50%; background: var(--ok); color: #fff;
+    display: grid; place-items: center; margin: 0 auto;
+  }
+  .finish .circle svg { width: 30px; height: 30px; }
+  .finish ul { list-style: none; padding: 0; margin: 0; text-align: right; display: flex; flex-direction: column; gap: 6px; }
+  .finish li { display: flex; gap: 10px; align-items: center; font-size: 15px; }
+  .finish li .n { width: 24px; height: 24px; border-radius: 50%; background: var(--ok); color: #fff; display: grid; place-items: center; font: 600 12px/1 var(--display); flex: 0 0 auto; }
+
+  /* מצב מארגן */
+  .org-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .org-head p { margin: 0; font-size: 14px; color: var(--muted); }
+  .edit { gap: 10px; }
+  .edit-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .edit-top .num { font: 700 15px/1 var(--display); color: var(--accent); }
+  .icons { display: flex; gap: 2px; }
+  .ib {
+    width: 44px; height: 44px; border-radius: 10px; border: 0; background: none; color: var(--ink);
+    display: grid; place-items: center;
+  }
+  .ib:disabled { color: var(--line2); cursor: default; }
+  .ib.danger { color: var(--danger); }
+  .ib svg { width: 20px; height: 20px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 13px; font-weight: 700; color: var(--muted); }
+  .field input, .field textarea {
+    width: 100%; min-height: 44px; padding: 10px 12px;
+    border: 1px solid var(--line2); border-radius: 10px;
+    background: var(--sunk); color: var(--ink); font-size: 16px;
+    resize: vertical;
+  }
+  .field textarea { min-height: 72px; line-height: 1.45; }
+  .confirm { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--warm-soft); border-radius: 12px; padding: 8px 8px 8px 14px; font-size: 15px; }
+  .confirm .acts { display: flex; gap: 4px; }
+  .confirm .acts .btn { width: auto; min-height: 40px; padding: 6px 14px; font-size: 14px; }
+  .confirm .acts .btn.del { background: var(--danger); border-color: var(--danger); color: #fff; }
+
+  .reset-row { display: flex; justify-content: center; margin-top: auto; padding-top: 8px; }
+
+  .foot {
+    border-top: 1px solid var(--line);
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    font-size: 12px; color: var(--muted); text-align: center;
+    background: var(--bg);
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-head">
+    <h1>אב טיפוס להדגמה</h1>
+    <p>נתוני דוגמה בלבד. שום דבר לא נשלח לשרת.</p>
+  </div>
+
+  <div class="phone">
+    <header class="top">
+      <div class="top-row">
+        <div>
+          <h2>סיור לגיבוש ענפי</h2>
+          <p class="sub" id="sub">יפו העתיקה</p>
+        </div>
+        <button class="switch" id="orgToggle" role="switch" aria-checked="false">
+          <span>מצב מארגן</span><span class="knob" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div id="stepArea"></div>
+    </header>
+
+    <main class="main" id="main"></main>
+
+    <footer class="foot">אב טיפוס להדגמה בסדנא. נתוני דוגמה בלבד. נבנה עם Claude, בלי לכתוב קוד.</footer>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var KEY = 'tour-gibush-v1';
+
+  var SAMPLE = [
+    { name: 'מגדל השעון',
+      text: 'מגדל השעון עומד בכניסה ליפו העתיקה ונבנה בתחילת המאה העשרים. זו נקודת המפגש הטבעית של הסיור, ומכאן ממשיכים ברגל לכל שאר התחנות.',
+      task: 'סבב פתיחה: כל אחד אומר את שמו, מה התפקיד שלו בצוות, ודבר אחד שאף אחד בצוות לא יודע עליו.',
+      tip: 'עמדו בצד המוצל של המגדל, שם שומעים טוב יותר.' },
+    { name: 'שוק הפשפשים',
+      text: 'סמטאות השוק מלאות חנויות יד שנייה, רהיטים ישנים ודוכנים צבעוניים. זה המקום שבו יפו הישנה והחדשה נפגשות באותו רחוב.',
+      task: 'בזוגות: מצאו חפץ אחד שמסמל את הצוות שלנו, צלמו אותו (לא קונים) והסבירו לכולם למה דווקא הוא.',
+      tip: 'יש לכם 15 דקות. נפגשים חזרה בפינה שבה התחלנו.' },
+    { name: 'כיכר קדומים',
+      text: 'הכיכר היא לב יפו העתיקה, מוקפת גלריות, סמטאות אבן וכנסייה עתיקה. ממנה נשקף נוף פתוח של חוף תל אביב.',
+      task: 'אתגר התמונה הקבוצתית: צילום אחד שבו כולם מופיעים, אף אחד לא עומד ישר, וכולם מחזיקים משהו כחול.',
+      tip: '' },
+    { name: 'גשר המשאלות',
+      text: 'על הגשר מוצבים שנים עשר סמלי מזלות מברונזה. לפי המסורת, מי שאוחז במזל שלו, מביט לים ומבקש משאלה, המשאלה תתגשם.',
+      task: 'כל אחד אומר משאלה אחת לצוות במשפט אחד בלבד. מישהו מתנדב לרשום את כולן, ונחזור אליהן בסוף הסיור.',
+      tip: '' },
+    { name: 'העץ המרחף',
+      text: 'עץ תפוז שנטוע בתוך כד חרס גדול התלוי באוויר על כבלים. יצירת האמנות הפכה לאחד הסמלים המוכרים של הסמטאות.',
+      task: 'דיון קצר: מה "מחזיק אותנו באוויר" כצוות? הסכימו על שלוש תשובות שכולם מאחוריהן.',
+      tip: 'הסמטה צרה. עמדו במעגל קטן כדי לא לחסום את המעבר.' },
+    { name: 'נמל יפו',
+      text: 'נמל יפו הוא אחד הנמלים העתיקים בעולם. היום יש בו רציפים, מסעדות וסירות דיג, וכאן הסיור שלנו מסתיים.',
+      task: 'סיכום: כל אחד משלים את המשפט "מהסיור הזה אני לוקח או לוקחת...". אחר כך ארוחה משותפת על הרציף.',
+      tip: 'השולחן שמור על שם הצוות, בשעה 13:00.' }
+  ];
+
+  function uid() { return 's' + Math.random().toString(36).slice(2, 9); }
+  function freshState() {
+    return {
+      stations: SAMPLE.map(function (s) { return { id: uid(), name: s.name, text: s.text, task: s.task, tip: s.tip }; }),
+      current: 1,
+      organizer: false
+    };
+  }
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      var s = JSON.parse(raw);
+      if (!s || !Array.isArray(s.stations)) return null;
+      return s;
+    } catch (e) { return null; }
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* אחסון חסום, ממשיכים בזיכרון */ }
+  }
+
+  var state = load() || freshState();
+  var viewing = null;      // אינדקס תחנה שמוצגת לקריאה בלבד
+  var notice = '';         // הודעה זמנית
+  var pendingDelete = null;
+
+  /* עזרי DOM */
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function svgIcon(path) {
+    var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    s.setAttribute('viewBox', '0 0 24 24');
+    s.setAttribute('fill', 'none');
+    s.setAttribute('stroke', 'currentColor');
+    s.setAttribute('stroke-width', '2.5');
+    s.setAttribute('stroke-linecap', 'round');
+    s.setAttribute('stroke-linejoin', 'round');
+    s.setAttribute('aria-hidden', 'true');
+    var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', path);
+    s.appendChild(p);
+    return s;
+  }
+  var ICON = {
+    check: 'M5 12l5 5L20 7',
+    up: 'M12 19V5M5 12l7-7 7 7',
+    down: 'M12 5v14M19 12l-7 7-7-7',
+    trash: 'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3',
+    plus: 'M12 5v14M5 12h14'
+  };
+
+  var $main = document.getElementById('main');
+  var $step = document.getElementById('stepArea');
+  var $sub = document.getElementById('sub');
+  var $toggle = document.getElementById('orgToggle');
+
+  $toggle.addEventListener('click', function () {
+    state.organizer = !state.organizer;
+    viewing = null; notice = ''; pendingDelete = null;
+    save(); render();
+  });
+
+  function clear(n) { while (n.firstChild) n.removeChild(n.firstChild); }
+
+  function render() {
+    var n = state.stations.length;
+    if (state.current > n) state.current = n;
+    $toggle.setAttribute('aria-checked', state.organizer ? 'true' : 'false');
+    $sub.textContent = 'יפו העתיקה · ' + n + ' תחנות';
+    clear($step); clear($main);
+    if (state.organizer) renderOrganizer();
+    else renderParticipant();
+    var row = el('div', 'reset-row');
+    var reset = el('button', 'btn text', 'איפוס לדוגמה');
+    reset.type = 'button';
+    reset.addEventListener('click', function () {
+      state = freshState(); viewing = null; notice = ''; pendingDelete = null;
+      save(); render();
+    });
+    row.appendChild(reset);
+    $main.appendChild(row);
+  }
+
+  /* ---------- מצב משתתף ---------- */
+  function renderParticipant() {
+    var n = state.stations.length;
+    var cur = state.current;
+    var finished = cur >= n;
+
+    // שורת התקדמות
+    var prog = el('div', 'progress');
+    var left = el('div');
+    left.appendChild(el('strong', null, finished ? n + ' מתוך ' + n : (cur + 1) + ' מתוך ' + n));
+    left.appendChild(document.createTextNode(' תחנות'));
+    prog.appendChild(left);
+    prog.appendChild(el('span', null, finished ? 'הסיור הושלם' : 'תחנה נוכחית: ' + state.stations[cur].name));
+    $step.appendChild(prog);
+
+    // סטפר
+    var st = el('div', 'stepper');
+    state.stations.forEach(function (s, i) {
+      if (i > 0) st.appendChild(el('div', 'seg' + (i <= cur ? ' done' : '')));
+      var cls = 'dot' + (i < cur ? ' done' : i === cur ? ' current' : '');
+      if (viewing === i) cls += ' viewing';
+      var b = el('button', cls);
+      b.type = 'button';
+      b.setAttribute('aria-label', 'תחנה ' + (i + 1) + ': ' + s.name);
+      var sp = el('span');
+      if (i < cur) sp.appendChild(svgIcon(ICON.check)); else sp.textContent = String(i + 1);
+      b.appendChild(sp);
+      b.addEventListener('click', function () { onDot(i); });
+      st.appendChild(b);
+    });
+    $step.appendChild(st);
+
+    if (notice) $main.appendChild(el('div', 'notice', notice));
+
+    if (finished && viewing === null) { renderFinish(); return; }
+
+    var idx = viewing === null ? cur : viewing;
+    var s = state.stations[idx];
+    var past = idx < cur;
+    var card = el('section', 'card' + (past ? ' past' : ''));
+
+    var eye = el('div', 'eyebrow');
+    eye.appendChild(el('span', null, 'תחנה ' + (idx + 1)));
+    if (past) eye.appendChild(el('span', 'badge', 'כבר מאחוריכם'));
+    card.appendChild(eye);
+    card.appendChild(el('h3', null, s.name));
+    card.appendChild(el('p', null, s.text));
+
+    var task = el('div', 'task');
+    task.appendChild(el('div', 'label', 'משימה לקבוצה'));
+    task.appendChild(el('p', null, s.task));
+    card.appendChild(task);
+
+    if (s.tip && s.tip.trim()) {
+      var tip = el('div', 'tip');
+      tip.appendChild(el('span', 'label', 'טיפ:'));
+      tip.appendChild(el('span', null, s.tip));
+      card.appendChild(tip);
+    }
+
+    if (past) {
+      var back = el('button', 'btn', 'חזרה לתחנה הנוכחית');
+      back.type = 'button';
+      back.addEventListener('click', function () { viewing = null; notice = ''; render(); });
+      card.appendChild(back);
+    } else {
+      var next = el('button', 'btn primary', idx === n - 1 ? 'הגענו, לסיום הסיור' : 'הגענו, לתחנה הבאה');
+      next.type = 'button';
+      next.addEventListener('click', function () {
+        state.current = Math.min(n, state.current + 1);
+        viewing = null; notice = '';
+        save(); render();
+        window.scrollTo(0, 0);
+      });
+      card.appendChild(next);
+    }
+    $main.appendChild(card);
+  }
+
+  function onDot(i) {
+    var cur = state.current;
+    if (i < cur) { viewing = i; notice = ''; }
+    else if (i === cur) { viewing = null; notice = ''; }
+    else {
+      viewing = null;
+      notice = 'קודם הגיעו לתחנה ' + (cur + 1) + ' (' + state.stations[cur].name + '). התחנה "' + state.stations[i].name + '" תיפתח בהמשך.';
+    }
+    render();
+  }
+
+  function renderFinish() {
+    var n = state.stations.length;
+    var card = el('section', 'card finish');
+    var c = el('div', 'circle'); c.appendChild(svgIcon(ICON.check)); card.appendChild(c);
+    card.appendChild(el('p', 'big', 'סיימתם את הסיור'));
+    card.appendChild(el('p', null, 'עברתם ' + n + ' תחנות ביפו העתיקה, השלמתם ' + n + ' משימות קבוצתיות, ויש לכם רשימת משאלות אחת לצוות. עכשיו הזמן לארוחה.'));
+    var ul = el('ul');
+    state.stations.forEach(function (s, i) {
+      var li = el('li');
+      li.appendChild(el('span', 'n', String(i + 1)));
+      li.appendChild(el('span', null, s.name));
+      ul.appendChild(li);
+    });
+    card.appendChild(ul);
+    var again = el('button', 'btn primary', 'להתחיל מחדש');
+    again.type = 'button';
+    again.addEventListener('click', function () { state.current = 0; viewing = null; notice = ''; save(); render(); });
+    card.appendChild(again);
+    $main.appendChild(card);
+  }
+
+  /* ---------- מצב מארגן ---------- */
+  function renderOrganizer() {
+    var n = state.stations.length;
+    var head = el('div', 'org-head');
+    var p = el('p', null, 'עורכים את המסלול. כל שינוי נשמר מיד במכשיר הזה. המשתתפים נמצאים כרגע בתחנה ' + Math.min(state.current + 1, n) + '.');
+    head.appendChild(p);
+    $main.appendChild(head);
+
+    state.stations.forEach(function (s, i) { $main.appendChild(editCard(s, i)); });
+
+    var add = el('button', 'btn');
+    add.type = 'button';
+    add.appendChild(svgIcon(ICON.plus));
+    add.appendChild(document.createTextNode('הוספת תחנה'));
+    add.addEventListener('click', function () {
+      state.stations.push({ id: uid(), name: 'תחנה חדשה', text: 'כמה משפטים על המקום ומה רואים בו.', task: 'מה הקבוצה עושה כאן?', tip: '' });
+      save(); render();
+      var last = $main.querySelectorAll('.edit');
+      if (last.length) { var inp = last[last.length - 1].querySelector('input'); if (inp) { inp.focus(); inp.select(); } }
+    });
+    $main.appendChild(add);
+  }
+
+  function editCard(s, i) {
+    var n = state.stations.length;
+    var card = el('section', 'card edit');
+    var top = el('div', 'edit-top');
+    top.appendChild(el('span', 'num', 'תחנה ' + (i + 1)));
+    var icons = el('div', 'icons');
+    var up = iconBtn(ICON.up, 'העברה למעלה'); up.disabled = i === 0;
+    up.addEventListener('click', function () { move(i, -1); });
+    var down = iconBtn(ICON.down, 'העברה למטה'); down.disabled = i === n - 1;
+    down.addEventListener('click', function () { move(i, 1); });
+    var del = iconBtn(ICON.trash, 'מחיקת התחנה'); del.classList.add('danger'); del.disabled = n <= 1;
+    del.addEventListener('click', function () { pendingDelete = s.id; render(); });
+    icons.appendChild(up); icons.appendChild(down); icons.appendChild(del);
+    top.appendChild(icons);
+    card.appendChild(top);
+
+    if (pendingDelete === s.id) {
+      var conf = el('div', 'confirm');
+      conf.appendChild(el('span', null, 'למחוק את "' + s.name + '"?'));
+      var acts = el('div', 'acts');
+      var yes = el('button', 'btn del', 'מחיקה'); yes.type = 'button';
+      yes.addEventListener('click', function () {
+        state.stations.splice(i, 1);
+        if (state.current > i) state.current -= 1;
+        if (state.current > state.stations.length) state.current = state.stations.length;
+        pendingDelete = null; save(); render();
+      });
+      var no = el('button', 'btn', 'ביטול'); no.type = 'button';
+      no.addEventListener('click', function () { pendingDelete = null; render(); });
+      acts.appendChild(yes); acts.appendChild(no);
+      conf.appendChild(acts);
+      card.appendChild(conf);
+    }
+
+    card.appendChild(field('input', s.id + '-name', 'שם התחנה', s.name, function (v) { s.name = v; }));
+    card.appendChild(field('textarea', s.id + '-text', 'הסבר למשתתפים', s.text, function (v) { s.text = v; }));
+    card.appendChild(field('textarea', s.id + '-task', 'משימה לקבוצה', s.task, function (v) { s.task = v; }));
+    card.appendChild(field('input', s.id + '-tip', 'טיפ (לא חובה)', s.tip, function (v) { s.tip = v; }));
+    return card;
+  }
+
+  function iconBtn(path, label) {
+    var b = el('button', 'ib');
+    b.type = 'button';
+    b.setAttribute('aria-label', label);
+    b.title = label;
+    b.appendChild(svgIcon(path));
+    return b;
+  }
+
+  function field(kind, id, label, value, onChange) {
+    var w = el('div', 'field');
+    var l = el('label', null, label); l.htmlFor = id;
+    var inp = document.createElement(kind);
+    inp.id = id;
+    if (kind === 'input') inp.type = 'text';
+    inp.value = value || '';
+    inp.addEventListener('input', function () { onChange(inp.value); save(); });
+    w.appendChild(l); w.appendChild(inp);
+    return w;
+  }
+
+  function move(i, dir) {
+    var j = i + dir;
+    if (j < 0 || j >= state.stations.length) return;
+    var arr = state.stations;
+    var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    save(); render();
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

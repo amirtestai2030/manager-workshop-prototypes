@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>מתכונים ענפיים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;700&display=swap">
+<style>
+/* פריסה: מסגרת טלפון ממורכזת (עד 430px); בטלפון ממלאת את המסך. שלושה מסכים: רשימה, מתכון, טופס. */
+:root {
+  --bg: #F3F4F1; --surface: #FFFFFF; --sunk: #EEF0EC; --ink: #17212B; --muted: #55606B;
+  --line: #DCE0DA; --line2: #9AA3AC; --accent: #1E4FA8; --on-accent: #FFFFFF;
+  --warm: #A9480C; --warm-soft: #FBEBDD; --on-warm: #FFFFFF; --ok: #2F6B3F; --danger: #B42318;
+  --font: Assistant, "Segoe UI", Arial, sans-serif;
+  --display: Rubik, Assistant, "Segoe UI", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12171D; --surface: #1B222A; --sunk: #151B21; --ink: #EEF1F4; --muted: #A7B0BA;
+    --line: #2C3640; --line2: #56636F; --accent: #8EB0F2; --on-accent: #0E1620;
+    --warm: #F0A464; --warm-soft: #3A2A1C; --on-warm: #1A1007; --ok: #86C79A; --danger: #FF9B8F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12171D; --surface: #1B222A; --sunk: #151B21; --ink: #EEF1F4; --muted: #A7B0BA;
+  --line: #2C3640; --line2: #56636F; --accent: #8EB0F2; --on-accent: #0E1620;
+  --warm: #F0A464; --warm-soft: #3A2A1C; --on-warm: #1A1007; --ok: #86C79A; --danger: #FF9B8F;
+  color-scheme: dark;
+}
+
+html { direction: rtl; }
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { font-family: var(--display); font-weight: 700; margin: 0; text-wrap: balance; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* --- מסגרת הטלפון --- */
+.stage {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding-block: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.stage-meta { text-align: center; color: var(--muted); font-size: 14px; }
+.stage-meta strong { display: block; font-family: var(--display); font-weight: 500; color: var(--ink); font-size: 15px; letter-spacing: .02em; }
+.frame {
+  width: 100%;
+  max-width: 430px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 32px;
+  height: min(860px, calc(100vh - 110px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+@media (max-width: 480px) {
+  .stage { padding: 0; gap: 0; display: block; }
+  .stage-meta { display: none; }
+  .frame { max-width: none; border: 0; border-radius: 0; height: auto; min-height: 100%; }
+}
+
+/* --- כותרת האפליקציה --- */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.topbar h1 { font-size: 22px; }
+.topbar .sub { font-size: 14px; color: var(--muted); }
+.icon-btn {
+  min-width: 44px; min-height: 44px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--surface); display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 600; padding: 0 14px; white-space: nowrap;
+}
+.icon-btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+
+/* --- אזור המסך הגולל --- */
+.screen { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 14px 16px 20px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+@media (max-width: 480px) { .screen { overflow: visible; } }
+
+/* חיפוש וצ'יפים */
+.search { position: relative; }
+.search input {
+  width: 100%; min-height: 48px; border-radius: 14px; border: 1px solid var(--line);
+  background: var(--sunk); padding: 0 42px 0 14px; font-size: 16px;
+}
+.search input::placeholder { color: var(--muted); }
+.search svg { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--surface); white-space: nowrap; font-weight: 600; color: var(--muted);
+}
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.count-line { font-size: 14px; color: var(--muted); display: flex; justify-content: space-between; align-items: baseline; }
+
+/* רשימת כרטיסים */
+.list { display: flex; flex-direction: column; gap: 10px; }
+.card {
+  width: 100%; text-align: right; display: flex; flex-direction: column; gap: 6px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  padding: 14px 16px; min-height: 44px;
+}
+.card:hover { border-color: var(--line2); }
+.card .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.card .name { font-family: var(--display); font-weight: 700; font-size: 18px; min-width: 0; }
+.card .cat { font-size: 13px; color: var(--warm); background: var(--warm-soft); padding: 2px 10px; border-radius: 999px; white-space: nowrap; font-weight: 600; }
+.card .by { color: var(--muted); font-size: 15px; }
+.card .meta { display: flex; gap: 14px; color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.card .meta span { display: inline-flex; align-items: center; gap: 4px; }
+.card.new { border-color: var(--accent); }
+.empty { text-align: center; color: var(--muted); padding: 28px 12px; background: var(--sunk); border-radius: 16px; }
+
+/* דף מתכון */
+.r-head { display: flex; flex-direction: column; gap: 6px; }
+.r-head h2 { font-size: 26px; line-height: 1.2; }
+.r-head .ar { color: var(--muted); font-size: 15px; }
+.r-head .ar [lang="ar"] { font-size: 17px; }
+.r-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.pill { background: var(--sunk); border-radius: 999px; padding: 6px 12px; font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.section-title { font-size: 17px; margin-top: 6px; display: flex; justify-content: space-between; align-items: baseline; }
+.section-title .small { font-family: var(--font); font-weight: 400; font-size: 14px; color: var(--muted); }
+.link-btn { background: none; border: 0; color: var(--accent); font-weight: 600; padding: 8px 4px; min-height: 44px; }
+.checklist { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.checklist label {
+  display: flex; align-items: center; gap: 12px; padding: 0 14px; min-height: 48px;
+  border-bottom: 1px solid var(--line); cursor: pointer;
+}
+.checklist label:last-child { border-bottom: 0; }
+.checklist input { width: 22px; height: 22px; accent-color: var(--accent); flex-shrink: 0; margin: 0; }
+.checklist input:checked + span { color: var(--muted); text-decoration: line-through; }
+.steps { margin: 0; padding: 0; list-style: none; counter-reset: step; display: flex; flex-direction: column; gap: 10px; }
+.steps li { display: flex; gap: 12px; align-items: flex-start; }
+.steps li::before {
+  counter-increment: step; content: counter(step);
+  flex-shrink: 0; width: 30px; height: 30px; border-radius: 999px;
+  background: var(--sunk); color: var(--ink); font-family: var(--display); font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 15px;
+}
+.note { background: var(--warm-soft); border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.note .who { font-size: 14px; color: var(--warm); font-weight: 700; }
+.like-row { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+.like {
+  min-height: 48px; padding: 0 20px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--surface); display: inline-flex; align-items: center; gap: 8px; font-weight: 700;
+}
+.like[aria-pressed="true"] { background: var(--warm-soft); border-color: var(--warm); color: var(--warm); }
+.like svg { width: 20px; height: 20px; }
+.like .n { font-variant-numeric: tabular-nums; }
+.like-row .hint { color: var(--muted); font-size: 14px; }
+
+/* טופס */
+.form { display: flex; flex-direction: column; gap: 14px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-weight: 600; }
+.field .help { font-size: 14px; color: var(--muted); }
+.field input, .field select, .field textarea {
+  width: 100%; min-height: 48px; border-radius: 14px; border: 1px solid var(--line);
+  background: var(--sunk); padding: 10px 14px; font-size: 16px;
+}
+.field textarea { min-height: 110px; resize: vertical; line-height: 1.5; }
+.field.invalid input, .field.invalid select, .field.invalid textarea { border-color: var(--danger); }
+.err { color: var(--danger); font-size: 14px; min-height: 0; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.seg { display: flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.seg label { flex: 1; min-height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 600; color: var(--muted); }
+.seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.seg input:checked + span { color: var(--on-accent); }
+.seg label:has(input:checked) { background: var(--accent); }
+.seg label:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: -3px; }
+.btn-primary {
+  min-height: 48px; border-radius: 999px; border: 0; background: var(--accent); color: var(--on-accent);
+  font-weight: 700; font-size: 17px; padding: 0 20px;
+}
+.btn-secondary { min-height: 48px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; padding: 0 20px; }
+.form-err { color: var(--danger); font-weight: 600; text-align: center; }
+
+/* פוטר, טוסט, איפוס */
+.frame { position: relative; }
+.toast {
+  position: absolute; bottom: 52px; left: 50%; transform: translate(-50%, 8px); max-width: calc(100% - 32px); text-align: center;
+  background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-weight: 600;
+  opacity: 0; transform: translateY(8px); transition: opacity .25s, transform .25s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+@media (max-width: 480px) { .toast { position: fixed; bottom: calc(60px + env(safe-area-inset-bottom, 0px)); } }
+.reset-row { text-align: center; margin-top: 8px; }
+.reset-btn { background: none; border: 1px dashed var(--line2); color: var(--muted); border-radius: 999px; padding: 8px 14px; min-height: 40px; font-size: 14px; }
+.footer {
+  border-top: 1px solid var(--line); background: var(--sunk); color: var(--muted);
+  font-size: 13px; text-align: center; padding: 10px 16px; line-height: 1.4;
+}
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="stage-meta">
+    <strong>אב טיפוס להדגמה</strong>
+    נתוני דוגמה בלבד. שום דבר לא נשלח לשרת.
+  </div>
+
+  <div class="frame" id="app">
+    <!-- כותרת -->
+    <header class="topbar">
+      <div>
+        <h1 id="pageTitle">מתכונים ענפיים</h1>
+        <div class="sub" id="pageSub">מה שעבר מפה לאוזן, נשאר כאן</div>
+      </div>
+      <button type="button" class="icon-btn primary" id="addBtn">+ הוספת מתכון</button>
+      <button type="button" class="icon-btn" id="backBtn" hidden>חזרה</button>
+    </header>
+
+    <!-- מסך 1: רשימה -->
+    <main class="screen" id="homeScreen">
+      <div class="search">
+        <label class="sr-only" for="searchInput">חיפוש מתכון</label>
+        <input type="search" id="searchInput" placeholder="חיפוש לפי שם, מצרך או מי שיתף" autocomplete="off">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      </div>
+      <div class="chips" id="chips" role="group" aria-label="סינון לפי קטגוריה"></div>
+      <div class="count-line"><span id="countText"></span><span>מהחדש לישן</span></div>
+      <div class="list" id="list"></div>
+      <div class="reset-row"><button type="button" class="reset-btn" id="resetBtn">איפוס לדוגמה</button></div>
+    </main>
+
+    <!-- מסך 2: מתכון -->
+    <main class="screen" id="recipeScreen" hidden>
+      <div class="r-head">
+        <h2 id="rName"></h2>
+        <div class="ar" id="rAr" hidden></div>
+        <div class="by" id="rBy"></div>
+        <div class="r-meta" id="rMeta"></div>
+      </div>
+
+      <h3 class="section-title">מצרכים <span class="small" id="checkCount"></span></h3>
+      <div class="checklist" id="ingredients"></div>
+      <div style="text-align:left"><button type="button" class="link-btn" id="clearChecks">ניקוי סימונים</button></div>
+
+      <h3 class="section-title">אופן ההכנה</h3>
+      <ol class="steps" id="steps"></ol>
+
+      <div class="note" id="noteBox">
+        <span class="who" id="noteWho"></span>
+        <span id="noteText"></span>
+      </div>
+
+      <div class="like-row">
+        <button type="button" class="like" id="likeBtn" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21s-7-4.6-9.3-9A5 5 0 0 1 12 6a5 5 0 0 1 9.3 6c-2.3 4.4-9.3 9-9.3 9z"/></svg>
+          <span>אהבתי</span>
+          <span class="n" id="likeCount">0</span>
+        </button>
+        <span class="hint" id="likeHint"></span>
+      </div>
+    </main>
+
+    <!-- מסך 3: טופס -->
+    <main class="screen" id="formScreen" hidden>
+      <form class="form" id="recipeForm" novalidate>
+        <div class="field" id="f-name">
+          <label for="inName">שם המתכון</label>
+          <input id="inName" type="text" placeholder="למשל: פשטידת כרובית של סבתא" maxlength="60">
+          <div class="err" id="e-name"></div>
+        </div>
+
+        <div class="field" id="f-cat">
+          <label for="inCat">קטגוריה</label>
+          <select id="inCat">
+            <option value="">בחירה</option>
+            <option value="מנה עיקרית">מנה עיקרית</option>
+            <option value="סלטים">סלטים</option>
+            <option value="מאפים">מאפים</option>
+            <option value="קינוחים">קינוחים</option>
+          </select>
+          <div class="err" id="e-cat"></div>
+        </div>
+
+        <div class="two">
+          <div class="field" id="f-time">
+            <label for="inTime">זמן הכנה (דקות)</label>
+            <input id="inTime" type="number" inputmode="numeric" min="1" max="600" placeholder="30">
+            <div class="err" id="e-time"></div>
+          </div>
+          <div class="field" id="f-serv">
+            <label for="inServ">מנות</label>
+            <input id="inServ" type="number" inputmode="numeric" min="1" max="100" placeholder="4">
+            <div class="err" id="e-serv"></div>
+          </div>
+        </div>
+
+        <div class="field" id="f-ing">
+          <label for="inIng">מצרכים</label>
+          <span class="help">מצרך אחד בכל שורה, עם הכמות</span>
+          <textarea id="inIng" placeholder="2 כוסות קמח&#10;כפית מלח&#10;..."></textarea>
+          <div class="err" id="e-ing"></div>
+        </div>
+
+        <div class="field" id="f-steps">
+          <label for="inSteps">שלבי ההכנה</label>
+          <span class="help">שלב אחד בכל שורה. המספור יתווסף לבד</span>
+          <textarea id="inSteps" placeholder="מחממים תנור ל-180 מעלות&#10;מערבבים את היבש&#10;..."></textarea>
+          <div class="err" id="e-steps"></div>
+        </div>
+
+        <div class="field" id="f-who">
+          <label for="inWho">השם שלך</label>
+          <input id="inWho" type="text" placeholder="כפי שיופיע ליד המתכון" maxlength="30">
+          <div class="err" id="e-who"></div>
+        </div>
+
+        <div class="field">
+          <span id="segLabel" style="font-weight:600">איך לכתוב ליד השם</span>
+          <div class="seg" role="radiogroup" aria-labelledby="segLabel">
+            <label><input type="radio" name="gender" value="f" id="genF" checked><span>שיתפה</span></label>
+            <label><input type="radio" name="gender" value="m" id="genM"><span>שיתף</span></label>
+          </div>
+        </div>
+
+        <div class="field" id="f-note">
+          <label for="inNote">הערה אישית (לא חובה)</label>
+          <span class="help">טיפ, מאיפה המתכון, או מה שכולם שואלים עליו</span>
+          <textarea id="inNote" style="min-height:80px" placeholder="הסוד הוא לא לפחד מהכמון"></textarea>
+        </div>
+
+        <div class="form-err" id="formErr" aria-live="polite"></div>
+        <button type="submit" class="btn-primary">שמירה ושיתוף עם הענף</button>
+        <button type="button" class="btn-secondary" id="cancelBtn">ביטול</button>
+      </form>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <footer class="footer">אב טיפוס להדגמה בסדנא. נתוני דוגמה בלבד. נבנה עם Claude, בלי לכתוב קוד.</footer>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  try { document.documentElement.setAttribute('dir', 'rtl'); document.documentElement.setAttribute('lang', 'he'); } catch (e) {}
+
+  var DAY = 86400000;
+  var STORAGE_KEY = 'recipes-anaf-v1';
+  var CATS = ['הכול', 'מנה עיקרית', 'סלטים', 'מאפים', 'קינוחים'];
+
+  function sample() {
+    var now = Date.now();
+    return [
+      {
+        id: 's1', name: 'כדורי תמרים', cat: 'קינוחים', by: 'נועה', gender: 'f', sharedAt: now - 1 * DAY,
+        time: 15, servings: 20, likes: 6,
+        ingredients: ['250 גרם תמרים מג\'הול מגולענים', '1 כוס שיבולת שועל', '3 כפות טחינה גולמית', '2 כפות קקאו', 'קורט מלח', 'קוקוס טחון לציפוי'],
+        steps: ['משרים את התמרים במים חמים 10 דקות ומסננים.', 'טוחנים במעבד מזון את התמרים עם השיבולת, הטחינה, הקקאו והמלח עד שנוצרת עיסה דביקה.', 'מרטיבים ידיים ומגלגלים כדורים בגודל אגוז.', 'מגלגלים בקוקוס ומעבירים למקרר לחצי שעה.'],
+        note: 'הבאתי לישיבת הצוות ביום רביעי ונעלמו תוך דקה. אפשר להחליף את הקוקוס בשומשום קלוי.'
+      },
+      {
+        id: 's2', name: 'עוגת תפוזים', cat: 'קינוחים', by: 'דנה', gender: 'f', sharedAt: now - 2 * DAY,
+        time: 60, servings: 10, likes: 9,
+        ingredients: ['3 ביצים', '1 כוס סוכר', '3/4 כוס שמן', '1 כוס מיץ תפוזים סחוט', 'גרידה מ-2 תפוזים', '2 כוסות קמח', 'שקית אבקת אפייה', 'אבקת סוכר לקישוט'],
+        steps: ['מחממים תנור ל-170 מעלות ומשמנים תבנית עוגה עגולה.', 'מקציפים ביצים וסוכר כ-3 דקות עד לקבלת קצף בהיר.', 'מוסיפים שמן, מיץ וגרידה ומערבבים בעדינות.', 'מנפים פנימה קמח ואבקת אפייה ומקפלים רק עד שהתערובת אחידה.', 'אופים 40 עד 45 דקות, עד שקיסם יוצא יבש.', 'מצננים לגמרי ומפזרים אבקת סוכר.'],
+        note: 'העוגה של יום ההולדת של סאמר. היא טובה יותר ביום שאחרי, אם שורדת.'
+      },
+      {
+        id: 's3', name: 'סלט טבולה', ar: 'تبولة', arHe: 'תַבּוּלֶה', cat: 'סלטים', by: 'רנא', gender: 'f', sharedAt: now - 5 * DAY,
+        time: 20, servings: 6, likes: 11,
+        ingredients: ['3 צרורות פטרוזיליה', '1/2 צרור נענע', '3 עגבניות בשלות', '1/2 כוס בורגול דק', '1 בצל ירוק', 'מיץ מ-2 לימונים', '1/4 כוס שמן זית', 'מלח ופלפל שחור'],
+        steps: ['משרים את הבורגול במים קרים 15 דקות וסוחטים היטב.', 'קוצצים דק דק את הפטרוזיליה והנענע (רק העלים).', 'חותכים את העגבניות לקוביות קטנות ואת הבצל הירוק לטבעות דקות.', 'מערבבים הכול בקערה עם הלימון, שמן הזית, המלח והפלפל.', 'מגישים מיד. אם מחכים, העגבניות מוציאות נוזלים.'],
+        note: 'הסוד הוא פטרוזיליה הרבה ובורגול מעט. אצלנו בבית זה סלט של פטרוזיליה, לא של בורגול.'
+      },
+      {
+        id: 's4', name: 'שקשוקה', cat: 'מנה עיקרית', by: 'נועה', gender: 'f', sharedAt: now - 10 * DAY,
+        time: 25, servings: 4, likes: 14,
+        ingredients: ['6 עגבניות בשלות או קופסת עגבניות מרוסקות', '1 פלפל אדום', '1 בצל', '3 שיני שום', '1 כף רסק עגבניות', '1 כפית פפריקה מתוקה', '1/2 כפית כמון', '4 ביצים', 'שמן זית, מלח ופלפל'],
+        steps: ['מטגנים בצל ופלפל קצוצים בשמן זית כ-6 דקות עד ריכוך.', 'מוסיפים שום, רסק, פפריקה וכמון ומטגנים דקה.', 'מוסיפים את העגבניות ומבשלים 10 דקות על אש בינונית עד שהרוטב מסמיך.', 'יוצרים גומות ברוטב ושוברים לתוכן ביצים.', 'מכסים ומבשלים 5 עד 7 דקות, עד שהחלבון יציב והחלמון עדיין רך.'],
+        note: 'ארוחת הבוקר של הצוות ביום ראשון. מגישים עם לחם טרי, ותמיד עושים יותר רוטב ממה שנראה הגיוני.'
+      },
+      {
+        id: 's5', name: 'לחם מחמצת מהיר', cat: 'מאפים', by: 'אמיר', gender: 'm', sharedAt: now - 14 * DAY,
+        time: 90, servings: 8, likes: 7,
+        ingredients: ['500 גרם קמח לחם', '100 גרם מחמצת פעילה', '1 כפית שמרים יבשים', '350 מ"ל מים פושרים', '10 גרם מלח', 'מעט סולת לתבנית'],
+        steps: ['מערבבים קמח, שמרים ומלח. מוסיפים מחמצת ומים ולשים 8 דקות לבצק חלק.', 'מכסים ומתפיחים 40 דקות במקום חמים, עד שהבצק מכפיל את נפחו.', 'מקפלים את הבצק לכיכר, מניחים על תבנית עם סולת ומתפיחים עוד 20 דקות.', 'מחממים תנור ל-230 מעלות עם קערת מים קטנה בתחתית.', 'חורצים את הכיכר ואופים 30 דקות, עד שהקרום חום והלחם נשמע חלול בהקשה.'],
+        note: 'מי שרוצה מחמצת, שיפנה אליי. יש לי אחת בת שנתיים שתמיד שמחה להתחלק.'
+      },
+      {
+        id: 's6', name: 'מג\'דרה', ar: 'مجدرة', arHe: 'מוּגַ\'דַרַה', cat: 'מנה עיקרית', by: 'סאמר', gender: 'm', sharedAt: now - 21 * DAY,
+        time: 50, servings: 6, likes: 12,
+        ingredients: ['1 כוס עדשים ירוקות', '1 כוס אורז', '4 בצלים גדולים', '1/2 כוס שמן', '1 כפית כמון', '1/2 כפית בהרט', 'מלח ופלפל', '3 כוסות מים'],
+        steps: ['מבשלים את העדשים במים 15 דקות עד שהן רכות אך שומרות על צורתן. מסננים.', 'פורסים את הבצלים דק ומטגנים בשמן על אש בינונית 20 דקות עד שהם חומים ופריכים. מוציאים חצי בצד לקישוט.', 'מוסיפים למחבת אורז, כמון, בהרט, מלח ופלפל ומערבבים דקה.', 'מוסיפים את העדשים ו-3 כוסות מים, מביאים לרתיחה, מכסים ומבשלים 18 דקות על אש נמוכה.', 'מכבים, משאירים מכוסה 10 דקות, מפזרים את הבצל השמור ומגישים עם יוגורט.'],
+        note: 'הבצל הוא העיקר. אין קיצור דרך: 20 דקות על אש בינונית, לא דקה פחות.'
+      },
+      {
+        id: 's7', name: 'חומוס ביתי', ar: 'حمص', arHe: 'חוּמוּס', cat: 'סלטים', by: 'יוסי', gender: 'm', sharedAt: now - 32 * DAY,
+        time: 30, servings: 6, likes: 15,
+        ingredients: ['250 גרם גרגרי חומוס יבשים', '1/2 כפית סודה לשתייה', '3/4 כוס טחינה גולמית', 'מיץ מ-1 לימון', '2 שיני שום', '1 כפית כמון', 'מלח', 'מי קרח', 'שמן זית ופפריקה להגשה'],
+        steps: ['משרים את הגרגרים לילה במים עם חצי מהסודה.', 'מבשלים במים חדשים עם שאר הסודה כשעה וחצי, עד שהגרגרים מתפוררים בלחיצה.', 'שומרים כוס ממי הבישול ומסננים.', 'טוחנים את הגרגרים החמים עם טחינה, לימון, שום, כמון ומלח.', 'מוסיפים מי קרח בהדרגה תוך כדי טחינה עד שהמרקם קרמי וחלק.', 'מגישים עם שמן זית, פפריקה וכמה גרגרים שלמים מלמעלה.'],
+        note: 'זמן ההכנה לא כולל את ההשריה. אל תוותרו על מי הקרח, זה מה שעושה את הבהירות.'
+      },
+      {
+        id: 's8', name: 'מרק עדשים', cat: 'מנה עיקרית', by: 'דנה', gender: 'f', sharedAt: now - 46 * DAY,
+        time: 40, servings: 6, likes: 8,
+        ingredients: ['1.5 כוסות עדשים כתומות', '1 בצל', '2 גזרים', '2 שיני שום', '1 כפית כמון', '1 כפית כורכום', '1.5 ליטר מים או ציר ירקות', 'מיץ מחצי לימון', 'שמן זית, מלח ופלפל'],
+        steps: ['מטגנים בצל קצוץ וגזר בקוביות בשמן זית 5 דקות.', 'מוסיפים שום, כמון וכורכום ומטגנים חצי דקה עד שמריחים.', 'מוסיפים עדשים שטופות ומים, מביאים לרתיחה ומבשלים 25 דקות על אש נמוכה.', 'טוחנים חלקית בבלנדר מוט למרקם סמיך אבל לא אחיד.', 'מתבלים במלח, פלפל ולימון ומגישים חם.'],
+        note: 'מרק של ימי חורף במשרד. אם נשאר למחרת, מדללים במעט מים כי הוא מסמיך בלילה.'
+      }
+    ];
+  }
+
+  // ----- אחסון -----
+  var state = { recipes: [], checks: {}, liked: {} };
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.recipes) && parsed.recipes.length) {
+          state = { recipes: parsed.recipes, checks: parsed.checks || {}, liked: parsed.liked || {} };
+          return;
+        }
+      }
+    } catch (e) {}
+    state = { recipes: sample(), checks: {}, liked: {} };
+  }
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  function resetAll() {
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    state = { recipes: sample(), checks: {}, liked: {} };
+    filter = 'הכול'; search.value = '';
+    renderHome(); showHome();
+    toast('הוחזרו נתוני הדוגמה');
+  }
+
+  // ----- עזרים -----
+  function $(id) { return document.getElementById(id); }
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined && text !== null) n.textContent = text;
+    return n;
+  }
+  function clear(node) { while (node.firstChild) node.removeChild(node.firstChild); }
+  function ago(ts) {
+    var d = Math.floor((Date.now() - ts) / DAY);
+    if (d <= 0) return 'היום';
+    if (d === 1) return 'אתמול';
+    if (d === 2) return 'לפני יומיים';
+    if (d < 7) return 'לפני ' + d + ' ימים';
+    if (d < 14) return 'לפני שבוע';
+    if (d < 21) return 'לפני שבועיים';
+    if (d < 30) return 'לפני 3 שבועות';
+    if (d < 45) return 'לפני חודש';
+    if (d < 75) return 'לפני חודש וחצי';
+    var m = Math.round(d / 30);
+    if (m === 2) return 'לפני חודשיים';
+    return 'לפני ' + m + ' חודשים';
+  }
+  function byLine(r) { return (r.gender === 'm' ? 'שיתף ' : 'שיתפה ') + r.by + ', ' + ago(r.sharedAt); }
+  function minutes(n) { return n + ' דק\''; }
+  function servingsText(n) { return n === 1 ? 'מנה אחת' : n + ' מנות'; }
+  var toastTimer;
+  function toast(msg) {
+    var t = $('toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2200);
+  }
+
+  // ----- ניווט -----
+  var screens = { home: $('homeScreen'), recipe: $('recipeScreen'), form: $('formScreen') };
+  function show(name, title, sub) {
+    Object.keys(screens).forEach(function (k) { screens[k].hidden = k !== name; });
+    $('pageTitle').textContent = title;
+    $('pageSub').textContent = sub;
+    $('addBtn').hidden = name !== 'home';
+    $('backBtn').hidden = name === 'home';
+    screens[name].scrollTop = 0;
+    try { window.scrollTo(0, 0); } catch (e) {}
+  }
+  function showHome() { show('home', 'מתכונים ענפיים', 'מה שעבר מפה לאוזן, נשאר כאן'); }
+
+  // ----- מסך הבית -----
+  var filter = 'הכול';
+  var search = $('searchInput');
+  function renderChips() {
+    var box = $('chips'); clear(box);
+    CATS.forEach(function (c) {
+      var b = el('button', 'chip', c);
+      b.type = 'button';
+      b.setAttribute('aria-pressed', c === filter ? 'true' : 'false');
+      b.addEventListener('click', function () { filter = c; renderHome(); });
+      box.appendChild(b);
+    });
+  }
+  function matches(r, q) {
+    if (!q) return true;
+    var hay = [r.name, r.by, r.cat].concat(r.ingredients).join(' ').toLowerCase();
+    return hay.indexOf(q) !== -1;
+  }
+  function renderHome() {
+    renderChips();
+    var q = search.value.trim().toLowerCase();
+    var list = $('list'); clear(list);
+    var rows = state.recipes.filter(function (r) { return (filter === 'הכול' || r.cat === filter) && matches(r, q); });
+    $('countText').textContent = rows.length === 0 ? 'אין תוצאות' : rows.length === 1 ? 'מתכון אחד' : rows.length + ' מתכונים';
+    if (!rows.length) {
+      var em = el('div', 'empty');
+      em.appendChild(el('div', null, 'לא נמצא מתכון שמתאים לחיפוש.'));
+      em.appendChild(el('div', null, 'אולי זו ההזדמנות להוסיף אותו?'));
+      list.appendChild(em); return;
+    }
+    rows.forEach(function (r) {
+      var card = el('button', 'card' + (r.isNew ? ' new' : ''));
+      card.type = 'button';
+      var row = el('div', 'row');
+      row.appendChild(el('span', 'name', r.name));
+      row.appendChild(el('span', 'cat', r.cat));
+      card.appendChild(row);
+      card.appendChild(el('div', 'by', byLine(r)));
+      var meta = el('div', 'meta');
+      meta.appendChild(el('span', null, '⏱ ' + minutes(r.time)));
+      meta.appendChild(el('span', null, '🍽 ' + servingsText(r.servings)));
+      meta.appendChild(el('span', null, '♥ ' + (r.likes + (state.liked[r.id] ? 1 : 0))));
+      card.appendChild(meta);
+      card.addEventListener('click', function () { openRecipe(r.id); });
+      list.appendChild(card);
+    });
+  }
+  search.addEventListener('input', renderHome);
+
+  // ----- דף מתכון -----
+  var current = null;
+  function openRecipe(id) {
+    var r = state.recipes.filter(function (x) { return x.id === id; })[0];
+    if (!r) return;
+    current = r;
+    show('recipe', r.cat, byLine(r));
+    $('rName').textContent = r.name;
+    var ar = $('rAr'); clear(ar);
+    if (r.ar) {
+      ar.hidden = false;
+      ar.appendChild(document.createTextNode('בערבית: '));
+      var a = el('span', null, r.ar); a.setAttribute('lang', 'ar'); a.setAttribute('dir', 'rtl');
+      ar.appendChild(a);
+      ar.appendChild(document.createTextNode(' (' + r.arHe + ')'));
+    } else { ar.hidden = true; }
+    $('rBy').textContent = byLine(r);
+    var meta = $('rMeta'); clear(meta);
+    meta.appendChild(el('span', 'pill', 'זמן הכנה: ' + minutes(r.time)));
+    meta.appendChild(el('span', 'pill', servingsText(r.servings)));
+    meta.appendChild(el('span', 'pill', r.ingredients.length + ' מצרכים'));
+
+    var checked = state.checks[r.id] || [];
+    var box = $('ingredients'); clear(box);
+    r.ingredients.forEach(function (ing, i) {
+      var lab = el('label');
+      var cb = document.createElement('input'); cb.type = 'checkbox'; cb.id = 'ing-' + r.id + '-' + i;
+      cb.checked = checked.indexOf(i) !== -1;
+      cb.addEventListener('change', function () {
+        var arr = state.checks[r.id] || [];
+        if (cb.checked) { if (arr.indexOf(i) === -1) arr.push(i); }
+        else { arr = arr.filter(function (x) { return x !== i; }); }
+        state.checks[r.id] = arr; save(); updateCheckCount();
+      });
+      lab.appendChild(cb); lab.appendChild(el('span', null, ing));
+      box.appendChild(lab);
+    });
+    updateCheckCount();
+
+    var steps = $('steps'); clear(steps);
+    r.steps.forEach(function (s) { steps.appendChild(el('li', null, s)); });
+
+    if (r.note && r.note.trim()) {
+      $('noteBox').hidden = false;
+      $('noteWho').textContent = 'הערה של ' + r.by + (r.gender === 'm' ? ', מי ששיתף' : ', מי ששיתפה');
+      $('noteText').textContent = r.note;
+    } else { $('noteBox').hidden = true; }
+    renderLike();
+  }
+  function updateCheckCount() {
+    if (!current) return;
+    var n = (state.checks[current.id] || []).length;
+    $('checkCount').textContent = n ? 'סומנו ' + n + ' מתוך ' + current.ingredients.length : 'סימון נשמר גם אם סוגרים';
+  }
+  function renderLike() {
+    var liked = !!state.liked[current.id];
+    $('likeBtn').setAttribute('aria-pressed', liked ? 'true' : 'false');
+    $('likeCount').textContent = current.likes + (liked ? 1 : 0);
+    $('likeHint').textContent = liked ? 'תודה! זה עוזר למתכון להישאר למעלה בזיכרון' : 'אהבתם? זה הסימן שהמתכון שווה שיתוף';
+  }
+  $('likeBtn').addEventListener('click', function () {
+    if (!current) return;
+    state.liked[current.id] = !state.liked[current.id]; save(); renderLike();
+  });
+  $('clearChecks').addEventListener('click', function () {
+    if (!current) return;
+    state.checks[current.id] = []; save(); openRecipe(current.id);
+  });
+
+  // ----- טופס -----
+  var form = $('recipeForm');
+  function lines(v) { return v.split('\n').map(function (s) { return s.replace(/^\s*(\d+[.)]|[-•*])\s*/, '').trim(); }).filter(Boolean); }
+  function setErr(key, msg) {
+    $('e-' + key).textContent = msg || '';
+    $('f-' + key).classList.toggle('invalid', !!msg);
+  }
+  function openForm() {
+    form.reset(); ['name', 'cat', 'time', 'serv', 'ing', 'steps', 'who'].forEach(function (k) { setErr(k, ''); });
+    $('formErr').textContent = '';
+    show('form', 'הוספת מתכון', 'כמה שורות, והמתכון לא הולך לאיבוד');
+    setTimeout(function () { $('inName').focus(); }, 50);
+  }
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = $('inName').value.trim(), cat = $('inCat').value, time = parseInt($('inTime').value, 10),
+        serv = parseInt($('inServ').value, 10), ing = lines($('inIng').value), steps = lines($('inSteps').value),
+        who = $('inWho').value.trim(), note = $('inNote').value.trim();
+    var first = null;
+    function fail(key, msg, id) { setErr(key, msg); if (!first) first = id; }
+    if (name.length < 2) fail('name', 'צריך שם למתכון, לפחות 2 תווים.', 'inName'); else setErr('name', '');
+    if (!cat) fail('cat', 'בחרו קטגוריה כדי שאפשר יהיה למצוא את המתכון.', 'inCat'); else setErr('cat', '');
+    if (!(time > 0 && time <= 600)) fail('time', 'זמן הכנה בדקות, בין 1 ל-600.', 'inTime'); else setErr('time', '');
+    if (!(serv > 0 && serv <= 100)) fail('serv', 'מספר מנות בין 1 ל-100.', 'inServ'); else setErr('serv', '');
+    if (ing.length < 2) fail('ing', 'צריך לפחות 2 מצרכים, כל אחד בשורה נפרדת.', 'inIng'); else setErr('ing', '');
+    if (steps.length < 2) fail('steps', 'צריך לפחות 2 שלבים, כל אחד בשורה נפרדת.', 'inSteps'); else setErr('steps', '');
+    if (who.length < 2) fail('who', 'כתבו את השם שלכם, כדי שידעו את מי לשאול.', 'inWho'); else setErr('who', '');
+    if (first) {
+      $('formErr').textContent = 'יש כמה שדות שצריך להשלים לפני השמירה.';
+      $(first).focus();
+      return;
+    }
+    $('formErr').textContent = '';
+    state.recipes.forEach(function (r) { r.isNew = false; });
+    var r = {
+      id: 'u' + Date.now(), name: name, cat: cat, time: time, servings: serv, ingredients: ing, steps: steps,
+      by: who, gender: $('genM').checked ? 'm' : 'f', sharedAt: Date.now(), likes: 0, note: note, isNew: true
+    };
+    state.recipes.unshift(r); save();
+    filter = 'הכול'; search.value = '';
+    renderHome();
+    openRecipe(r.id);
+    toast('המתכון נשמר ומופיע בראש הרשימה');
+  });
+
+  // ----- כפתורים כלליים -----
+  $('addBtn').addEventListener('click', openForm);
+  $('cancelBtn').addEventListener('click', function () { renderHome(); showHome(); });
+  $('backBtn').addEventListener('click', function () { renderHome(); showHome(); });
+  $('resetBtn').addEventListener('click', resetAll);
+
+  load();
+  renderHome();
+  showHome();
+})();
+</script>
+</body>
+</html>
