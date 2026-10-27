@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>הכנות לסדנה</title>
+<meta name="description" content="הפקה בעידן סוכני הבינה · יום שלישי 3.11 · מה נעשה ומה להכין מראש">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;700&display=swap">
+<style>
+  html, body { margin: 0; }
+  /* Layout: one reading column. Hero with date and the two meeting links, the day's timeline, the human-machine-human loop, the prep checklist with a progress bar, and the finish form that opens WhatsApp. Same tokens as the prototypes home page. */
+  :root {
+    --bg: #F3F4F1; --surface: #FFFFFF; --sunk: #EEF0EC; --ink: #17212B; --muted: #55606B;
+    --line: #DCE0DA; --line2: #9AA3AC; --accent: #1E4FA8; --on-accent: #FFFFFF; --accent-soft: #E3EBF8;
+    --warm: #A9480C; --warm-soft: #FBEBDD; --ok: #2F6B3F; --ok-soft: #E2F0E5; --wa: #1A7F4B;
+    --font: Assistant, "Segoe UI", Arial, sans-serif;
+    --display: Rubik, Assistant, "Segoe UI", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12171D; --surface: #1B222A; --sunk: #151B21; --ink: #EEF1F4; --muted: #A7B0BA;
+      --line: #2C3640; --line2: #56636F; --accent: #8EB0F2; --on-accent: #0E1620; --accent-soft: #1E2A3D;
+      --warm: #F0A464; --warm-soft: #3A2A1C; --ok: #86C79A; --ok-soft: #1D3024; --wa: #5FD39A;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12171D; --surface: #1B222A; --sunk: #151B21; --ink: #EEF1F4; --muted: #A7B0BA;
+    --line: #2C3640; --line2: #56636F; --accent: #8EB0F2; --on-accent: #0E1620; --accent-soft: #1E2A3D;
+    --warm: #F0A464; --warm-soft: #3A2A1C; --ok: #86C79A; --ok-soft: #1D3024; --wa: #5FD39A;
+    color-scheme: dark;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.55; }
+  h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  a { color: var(--accent); }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .wrap {
+    max-width: 860px; margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 40px 72px;
+    display: flex; flex-direction: column; gap: 48px;
+  }
+  section { display: flex; flex-direction: column; gap: 18px; }
+  h2 { font-size: clamp(24px, 3.6vw, 30px); font-weight: 700; line-height: 1.2; }
+  .sub { color: var(--muted); font-size: 17px; text-wrap: pretty; }
+
+  /* Hero */
+  .top { display: flex; flex-direction: column; gap: 18px; border-bottom: 2px solid var(--ink); padding-bottom: 32px; }
+  .kicker { font-size: 15px; font-weight: 700; letter-spacing: .04em; color: var(--accent); }
+  h1 { font-weight: 700; font-size: clamp(36px, 7vw, 60px); line-height: 1.05; }
+  .lead { font-size: 20px; color: var(--muted); max-width: 60ch; text-wrap: pretty; }
+  .facts { display: flex; flex-wrap: wrap; gap: 10px; }
+  .fact { display: inline-flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 8px 16px; font-weight: 600; font-size: 16px; }
+  .fact svg { width: 18px; height: 18px; color: var(--accent); flex: none; }
+  .countdown { font-family: var(--display); font-weight: 700; font-size: 18px; color: var(--warm); }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 22px; border-radius: 999px; font: 700 17px/1 var(--font); text-decoration: none; border: 2px solid var(--accent); cursor: pointer; }
+  .btn svg { width: 18px; height: 18px; flex: none; }
+  .btn.primary { background: var(--accent); color: var(--on-accent); }
+  .btn.ghost { background: transparent; color: var(--accent); }
+  .btn.wa { background: var(--wa); border-color: var(--wa); color: #FFFFFF; }
+  :root[data-theme="dark"] .btn.wa { color: #0E1620; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.wa { color: #0E1620; } }
+  .btn[disabled] { opacity: .45; cursor: not-allowed; }
+  .hint { font-size: 15px; color: var(--muted); }
+
+  /* Timeline */
+  .timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+  .slot { display: grid; grid-template-columns: 112px 1fr; gap: 16px; padding: 16px 0; border-top: 1px solid var(--line); }
+  .slot:last-child { border-bottom: 1px solid var(--line); }
+  .time { font-family: var(--display); font-weight: 700; font-size: 17px; font-variant-numeric: tabular-nums; direction: ltr; text-align: right; color: var(--accent); padding-top: 2px; }
+  .slot h3 { font-size: 20px; font-weight: 700; line-height: 1.3; }
+  .slot p { color: var(--muted); font-size: 16px; margin-top: 4px; text-wrap: pretty; }
+  .agent-tag { display: inline-block; font-family: var(--font); font-size: 13px; font-weight: 700; padding: 2px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); margin-inline-start: 8px; vertical-align: 3px; }
+  .slot.break { padding: 10px 0; }
+  .slot.break .time { color: var(--muted); font-weight: 500; font-size: 15px; }
+  .slot.break h3 { font-family: var(--font); font-size: 16px; font-weight: 600; color: var(--muted); }
+  @media (max-width: 520px) { .slot { grid-template-columns: 1fr; gap: 2px; } .time { text-align: right; } }
+
+  /* Loop */
+  .loop { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .loop-row { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: stretch; gap: 10px; }
+  .node { border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 6px; text-align: center; }
+  .node.human { background: var(--warm-soft); }
+  .node.machine { background: var(--accent-soft); }
+  .node .ico { font-size: 28px; line-height: 1; }
+  .node b { font-family: var(--display); font-size: 20px; }
+  .node span { font-size: 15px; color: var(--muted); text-wrap: pretty; }
+  .arrow { align-self: center; color: var(--line2); }
+  .arrow svg { width: 26px; height: 26px; display: block; }
+  .loop-back { text-align: center; font-size: 15px; color: var(--muted); }
+  .quote { font-family: var(--display); font-weight: 500; font-size: 19px; text-align: center; text-wrap: balance; border-top: 1px solid var(--line); padding-top: 16px; }
+  @media (max-width: 640px) {
+    .loop-row { grid-template-columns: 1fr; }
+    .arrow { justify-self: center; transform: rotate(-90deg); }
+  }
+
+  /* Checklist */
+  .progress { display: flex; flex-direction: column; gap: 8px; position: sticky; top: 0; z-index: 2; background: var(--bg); padding: 12px 0; }
+  .progress-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; font-weight: 700; }
+  .progress-top span:last-child { color: var(--muted); font-weight: 600; font-size: 15px; }
+  .bar { height: 10px; border-radius: 999px; background: var(--sunk); border: 1px solid var(--line); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--ok); border-radius: 999px; transition: width .3s ease; }
+  .steps { display: flex; flex-direction: column; gap: 12px; }
+  .step { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: border-color .2s; }
+  .step.done { border-color: var(--ok); }
+  .step-head { display: flex; align-items: center; gap: 14px; padding: 14px 16px; }
+  .check { position: relative; flex: none; width: 30px; height: 30px; }
+  .check input { appearance: none; -webkit-appearance: none; margin: 0; width: 30px; height: 30px; border: 2px solid var(--line2); border-radius: 8px; background: var(--surface); cursor: pointer; }
+  .check input:checked { background: var(--ok); border-color: var(--ok); }
+  .check svg { position: absolute; inset: 5px; width: 20px; height: 20px; color: var(--surface); pointer-events: none; opacity: 0; }
+  .check input:checked + svg { opacity: 1; }
+  .step-title { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; cursor: pointer; }
+  .step-title b { font-family: var(--display); font-size: 19px; font-weight: 700; line-height: 1.3; }
+  .step-title small { font-size: 15px; color: var(--muted); }
+  .step.done .step-title b { text-decoration: line-through; text-decoration-color: var(--ok); text-decoration-thickness: 2px; }
+  .opt { font-family: var(--font); font-size: 13px; font-weight: 700; color: var(--muted); background: var(--sunk); border-radius: 999px; padding: 1px 9px; margin-inline-start: 6px; vertical-align: 2px; }
+  .toggle { flex: none; width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: var(--sunk); color: var(--ink); cursor: pointer; display: grid; place-items: center; }
+  .toggle svg { width: 18px; height: 18px; transition: transform .2s; }
+  .step.open .toggle svg { transform: rotate(180deg); }
+  .step-body { display: none; padding: 0 16px 18px; padding-inline-start: 60px; flex-direction: column; gap: 12px; }
+  .step.open .step-body { display: flex; }
+  .step-body ol { margin: 0; padding-inline-start: 20px; display: flex; flex-direction: column; gap: 6px; }
+  .step-body .btn { align-self: flex-start; min-height: 42px; font-size: 16px; padding: 0 18px; }
+  @media (max-width: 520px) { .step-body { padding-inline-start: 16px; } }
+  .warn { display: flex; gap: 12px; align-items: flex-start; background: var(--warm-soft); border-radius: 14px; padding: 14px 16px; font-size: 16px; }
+  .warn b { color: var(--warm); }
+  .safe { display: flex; gap: 12px; align-items: flex-start; background: var(--accent-soft); border-radius: 14px; padding: 14px 16px; font-size: 16px; text-wrap: pretty; }
+  .addr { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; background: var(--sunk); border: 1px dashed var(--line2); border-radius: 10px; padding: 8px 10px; font-size: 14px; color: var(--muted); }
+  .addr code { flex: 1 1 auto; min-width: 0; font: 600 15px/1.4 ui-monospace, Consolas, "Courier New", monospace; color: var(--ink); direction: ltr; text-align: left; overflow-wrap: anywhere; }
+  .copy { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--accent); background: var(--surface); color: var(--accent); font: 700 15px/1 var(--font); cursor: pointer; }
+  .copy svg { width: 16px; height: 16px; }
+  .copy.ok { background: var(--ok); border-color: var(--ok); color: var(--surface); }
+
+  /* Finish form */
+  .finish { background: var(--surface); border: 2px solid var(--ink); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.wide { grid-column: 1 / -1; }
+  .field label { font-weight: 700; font-size: 15px; }
+  .field input, .field textarea { font: 17px/1.4 var(--font); color: var(--ink); background: var(--bg); border: 1px solid var(--line2); border-radius: 10px; padding: 11px 12px; width: 100%; }
+  .field textarea { resize: vertical; min-height: 76px; }
+  .field input[dir="ltr"] { text-align: left; }
+  .field .err { font-size: 14px; color: var(--warm); min-height: 0; }
+  .field.bad input { border-color: var(--warm); }
+  @media (max-width: 560px) { .fields { grid-template-columns: 1fr; } }
+  .confirm { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: 12px; background: var(--sunk); }
+  .confirm label { cursor: pointer; font-weight: 600; }
+  .confirm.locked { opacity: .6; }
+  .confirm.locked label { cursor: not-allowed; }
+  .done-box { display: none; flex-direction: column; gap: 12px; background: var(--ok-soft); border-radius: 14px; padding: 18px; }
+  .done-box.show { display: flex; }
+  .done-box h3 { font-size: 22px; color: var(--ok); }
+
+  .closing { border-top: 1px solid var(--line); padding-top: 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; color: var(--muted); }
+  .closing p { font-size: 17px; }
+  .closing b { color: var(--ink); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+  <symbol id="i-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></symbol>
+  <symbol id="i-wa" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3ZM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4A9.8 9.8 0 0 1 12 2.2a9.8 9.8 0 0 1 0 19.6ZM12 0a12 12 0 0 0-10.3 18L0 24l6.2-1.6A12 12 0 1 0 12 0Z"/></symbol>
+</svg>
+
+<main class="wrap">
+
+  <header class="top">
+    <p class="kicker">סדנת מנהלים · מסמך הכנה</p>
+    <h1>הפקה בעידן סוכני הבינה</h1>
+    <p class="lead">צ'אטבוט מסביר איך עושים. סוכן עושה. בסדנה נעבוד עם שני סוכנים, Gemini Notebook ו-Claude, ונראה איך שיתוף הפעולה אדם ← מכונה ← אדם משדרג את העבודה שלנו.</p>
+    <div class="facts">
+      <span class="fact"><svg><use href="#i-cal"/></svg>יום שלישי, 3 בנובמבר 2026</span>
+      <span class="fact"><svg><use href="#i-clock"/></svg><span dir="ltr">08:50–15:00</span></span>
+      <span class="fact"><svg><use href="#i-video"/></svg>Google Meet, מהג'ימייל האישי</span>
+    </div>
+    <p class="countdown" id="countdown" aria-live="polite"></p>
+    <div class="actions">
+      <a class="btn primary" href="https://calendar.app.google/tiDi7Cqdo2EDg98r5" target="_blank" rel="noopener"><svg><use href="#i-cal"/></svg>אישור הגעה והוספה ליומן</a>
+      <a class="btn ghost" href="https://meet.google.com/jka-wbva-csu" target="_blank" rel="noopener"><svg><use href="#i-video"/></svg>קישור למפגש</a>
+    </div>
+    <p class="hint">ההכנות לוקחות כחצי שעה. סמנו כל שלב שסיימתם, ובסוף שלחו לי אישור בוואטסאפ.</p>
+  </header>
+
+  <section aria-labelledby="h-day">
+    <h2 id="h-day">מהלך היום</h2>
+    <ol class="timeline">
+      <li class="slot break"><span class="time">08:50</span><div><h3>התחברות ל-Meet ובדיקת שמע ומצלמה</h3></div></li>
+      <li class="slot"><span class="time">09:00–09:30</span><div><h3>פתיחה: מה זה סוכן?</h3><p>ההבדל בין צ'אטבוט שעונה לסוכן שמקבל מטרה ומבצע אותה. הלולאה שהסוכן עובד בה: להבין, לתכנן, לפעול, לבדוק. ומה כבר קורה בעולם.</p></div></li>
+      <li class="slot"><span class="time">09:30–10:00</span><div><h3>סוכן ראשון: Gemini Notebook<span class="agent-tag">סוכן 1</span></h3><p>מהמסמכים שלכם לתשובות שאפשר לבדוק, עם הפניה למקור.</p></div></li>
+      <li class="slot break"><span class="time">10:00–10:15</span><div><h3>הפסקה קצרה</h3></div></li>
+      <li class="slot"><span class="time">10:15–11:00</span><div><h3>Gemini Notebook: התנסות והצגת תוצרים<span class="agent-tag">סוכן 1</span></h3><p>מעלים את הדוח שקראתם, משווים לקריאה העצמית, ומפיקים ממנו תוצר: סקירת שמע, מצגת או חידון.</p></div></li>
+      <li class="slot"><span class="time">11:00–12:00</span><div><h3>סוכן שני: Claude<span class="agent-tag">סוכן 2</span></h3><p>מכאב אמיתי בענף לאפליקציה עובדת, בלי לכתוב קוד. השיטה: אבחון, אפיון, בנייה.</p></div></li>
+      <li class="slot break"><span class="time">12:00–12:45</span><div><h3>הפסקת צהריים</h3></div></li>
+      <li class="slot"><span class="time">12:45–14:15</span><div><h3>בונים אפליקציה: עבודה עצמית והצגת תוצרים<span class="agent-tag">סוכן 2</span></h3><p>כל אחד בונה אפליקציה לכאב שבחר ומעלה אותה לאוויר ב-Netlify.</p></div></li>
+      <li class="slot break"><span class="time">14:15–14:30</span><div><h3>הפסקה</h3></div></li>
+      <li class="slot"><span class="time">14:30–15:00</span><div><h3>סיכום</h3><p>מה לוקחים מכאן לעבודה, ואיך נראה שיתוף הפעולה בין האדם לסוכן.</p></div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="h-loop">
+    <h2 id="h-loop">החוט שעובר לאורך היום</h2>
+    <div class="loop">
+      <div class="loop-row">
+        <div class="node human"><span class="ico" aria-hidden="true">🧑‍💼</span><b>אדם</b><span>מגדיר מטרה ותנאי הצלחה, ומחליט מה לא להעביר לסוכן</span></div>
+        <span class="arrow" aria-hidden="true"><svg><use href="#i-arrow"/></svg></span>
+        <div class="node machine"><span class="ico" aria-hidden="true">🤖</span><b>מכונה</b><span>הסוכן מבין, מתכנן, פועל ובודק את עצמו</span></div>
+        <span class="arrow" aria-hidden="true"><svg><use href="#i-arrow"/></svg></span>
+        <div class="node human"><span class="ico" aria-hidden="true">🧑‍💼</span><b>אדם</b><span>מאמת את התוצאה, מחליט ומשתף</span></div>
+      </div>
+      <p class="loop-back">↻ ומשם לסבב הבא, עם מטרה מדויקת יותר</p>
+      <p class="quote">המנהל לא כותב קוד. הוא יודע מה כואב, מחליט מה חשוב ובודק שזה עובד.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-prep">
+    <h2 id="h-prep">מה להכין לפני הסדנה</h2>
+    <p class="sub">כל החשבונות חינמיים. מומלץ לפתוח את כולם עם אותה כתובת Gmail אישית, זו שאיתה תיכנסו ל-Meet.</p>
+
+    <div class="progress" aria-live="polite">
+      <div class="progress-top"><span id="prog-text">0 מתוך 7 הושלמו</span><span id="prog-note">שלבים 1–6 חובה</span></div>
+      <div class="bar"><i id="prog-bar"></i></div>
+    </div>
+
+    <div class="safe" role="note"><span aria-hidden="true">🔒</span><p><b>קישור לא נפתח?</b> ליד כל כפתור מופיעה הכתובת המדויקת של האתר. לחצו "העתקה", הדביקו בשורת הכתובת שבראש הדפדפן ולחצו Enter. כך תגיעו בדיוק לאתר הרשמי, ולא לאתר אחר שנראה דומה. עדיף לא לחפש את שם האתר ב-Google, כי בראש תוצאות החיפוש מופיעות לפעמים מודעות שמובילות לאתרים אחרים.</p></div>
+
+    <div class="steps" id="steps">
+
+      <article class="step" data-id="computer">
+        <div class="step-head">
+          <span class="check"><input type="checkbox" id="c-computer" aria-label="מחשב"><svg><use href="#i-tick"/></svg></span>
+          <label class="step-title" for="c-computer"><b>1. מחשב עם מצלמה ומיקרופון</b><small>מחשב נייד או נייח. עובדים מהמחשב, והטלפון הוא רק גיבוי.</small></label>
+          <button class="toggle" type="button" aria-expanded="false" aria-label="איך עושים"><svg><use href="#i-chev"/></svg></button>
+        </div>
+        <div class="step-body">
+          <ol>
+            <li>דפדפן Chrome מעודכן.</li>
+            <li>מצלמה ומיקרופון שעובדים, ועדיף אוזניות.</li>
+            <li>חיבור יציב לאינטרנט ומטען, היום ארוך.</li>
+            <li>מחשב שמאפשר להיכנס לאתרים חיצוניים. במחשבים ארגוניים חלק מהאתרים חסומים.</li>
+          </ol>
+        </div>
+      </article>
+
+      <article class="step" data-id="gmail">
+        <div class="step-head">
+          <span class="check"><input type="checkbox" id="c-gmail" aria-label="ג'ימייל ו-Meet"><svg><use href="#i-tick"/></svg></span>
+          <label class="step-title" for="c-gmail"><b>2. חשבון Gmail אישי: אישור הגעה ובדיקת Meet</b><small>המפגש ב-Google Meet מהג'ימייל האישי, לא מכתובת העבודה.</small></label>
+          <button class="toggle" type="button" aria-expanded="false" aria-label="איך עושים"><svg><use href="#i-chev"/></svg></button>
+        </div>
+        <div class="step-body">
+          <ol>
+            <li>פתחו את דף האירוע, וודאו שאתם מחוברים עם ה-Gmail האישי, ולחצו <b>"כן"</b>. ההזמנה תגיע למייל ותיכנס ליומן.</li>
+            <li>פתחו את קישור המפגש <b>בדפדפן Chrome רגיל</b>, כשאתם מחוברים ל-Gmail האישי.</li>
+            <li>כשהדפדפן מבקש הרשאה למצלמה ולמיקרופון, לחצו "אישור". במסך שלפני ההצטרפות תראו את עצמכם ותוכלו לבדוק שהמיקרופון קולט. <b>אל תלחצו "הצטרפות"</b>, רק בדיקה.</li>
+            <li>נפתח דף פרסומי של Google Meet במקום מסך המפגש? סימן שאתם לא מחוברים ל-Gmail, או שהקישור נפתח בדפדפן פנימי של אפליקציה אחרת. התחברו ל-Gmail ב-Chrome ופתחו את הקישור שוב.</li>
+            <li>אין לכם Gmail אישי? פותחים אחד בחינם בכתובת accounts.google.com/signup.</li>
+          </ol>
+          <div class="actions">
+            <a class="btn ghost" href="https://calendar.app.google/tiDi7Cqdo2EDg98r5" target="_blank" rel="noopener"><svg><use href="#i-ext"/></svg>אישור הגעה ביומן</a>
+            <a class="btn ghost" href="https://meet.google.com/jka-wbva-csu" target="_blank" rel="noopener"><svg><use href="#i-ext"/></svg>בדיקה ב-Meet</a>
+          </div>
+          <div class="addr"><span>כתובת האתר:</span><code dir="ltr">calendar.app.google/tiDi7Cqdo2EDg98r5</code><button type="button" class="copy" data-copy="https://calendar.app.google/tiDi7Cqdo2EDg98r5"><svg><use href="#i-copy"/></svg>העתקה</button></div>
+          <div class="addr"><span>כתובת האתר:</span><code dir="ltr">meet.google.com/jka-wbva-csu</code><button type="button" class="copy" data-copy="https://meet.google.com/jka-wbva-csu"><svg><use href="#i-copy"/></svg>העתקה</button></div>
+        </div>
+      </article>
+
+      <article class="step" data-id="notebook">
+        <div class="step-head">
+          <span class="check"><input type="checkbox" id="c-notebook" aria-label="Gemini Notebook"><svg><use href="#i-tick"/></svg></span>
+          <label class="step-title" for="c-notebook"><b>3. כניסה ל-Gemini Notebook</b><small>הסוכן הראשון של היום. בעבר הוא נקרא NotebookLM.</small></label>
+          <button class="toggle" type="button" aria-expanded="false" aria-label="איך עושים"><svg><use href="#i-chev"/></svg></button>
+        </div>
+        <div class="step-body">
+          <ol>
+            <li>היכנסו לאתר <b>בדפדפן</b> עם ה-Gmail האישי. בסדנה עובדים עם האתר, לא עם האפליקציה.</li>
+            <li>לחצו "כניסה ל-Gemini Notebook" וצרו מחברת חדשה וריקה.</li>
+            <li>זהו, את הדוח נעלה ביחד בסדנה.</li>
+          </ol>
+          <a class="btn ghost" href="https://notebook.google.com" data-browser-only target="_blank" rel="noopener"><svg><use href="#i-ext"/></svg>פתיחת Gemini Notebook בדפדפן</a>
+          <p class="hint">בטלפון נפתחה האפליקציה במקום הדפדפן? לחצו לחיצה ארוכה על הכפתור ובחרו "פתיחה בכרטיסייה חדשה".</p>
+          <div class="addr"><span>כתובת האתר:</span><code dir="ltr">notebook.google.com</code><button type="button" class="copy" data-copy="https://notebook.google.com"><svg><use href="#i-copy"/></svg>העתקה</button></div>
+        </div>
+      </article>
+
+      <article class="step" data-id="claude">
+        <div class="step-head">
+          <span class="check"><input type="checkbox" id="c-claude" aria-label="Claude"><svg><use href="#i-tick"/></svg></span>
+          <label class="step-title" for="c-claude"><b>4. חשבון Claude</b><small>הסוכן השני של היום. חשבון חינמי מספיק.</small></label>
+          <button class="toggle" type="button" aria-expanded="false" aria-label="איך עושים"><svg><use href="#i-chev"/></svg></button>
+        </div>
+        <div class="step-body">
+          <ol>
+            <li>היכנסו ל-claude.ai ולחצו <b>Continue with Google</b>.</li>
+            <li>בחרו את ה-Gmail האישי ואשרו.</li>
+            <li>כבר יש לכם חשבון? רק ודאו שאתם מצליחים להתחבר.</li>
+            <li>בדיקה קצרה: כתבו "שלום" וודאו שמתקבלת תשובה.</li>
+          </ol>
+          <a class="btn ghost" href="https://claude.ai/login" target="_blank" rel="noopener"><svg><use href="#i-ext"/></svg>פתיחת חשבון Claude</a>
+          <div class="addr"><span>כתובת האתר:</span><code dir="ltr">claude.ai/login</code><button type="button" class="copy" data-copy="https://claude.ai/login"><svg><use href="#i-copy"/></svg>העתקה</button></div>
+        </div>
+      </article>
+
+      <article class="step" data-id="netlify">
+        <div class="step-head">
+          <span class="check"><input type="checkbox" id="c-netlify" aria-label="Netlify"><svg><use href="#i-tick"/></svg></span>
+          <label class="step-title" for="c-netlify"><b>5. חשבון Netlify</b><small>לשם נעלה את האפליקציה שתבנו, כדי שתיפתח בכל טלפון.</small></label>
+          <button class="toggle" type="button" aria-expanded="false" aria-label="איך עושים"><svg><use href="#i-chev"/></svg></button>
+        </div>
+        <div class="step-body">
+          <ol>
+            <li>היכנסו לדף ההרשמה ולחצו <b>Sign up with Google</b>.</li>
+            <li>בחרו את ה-Gmail האישי.</li>
+            <li>אם נשאלים שאלות היכרות, אפשר לענות בקצרה או לדלג. המסלול החינמי מספיק.</li>
+          </ol>
+          <a class="btn ghost" href="https://app.netlify.com/signup" target="_blank" rel="noopener"><svg><use href="#i-ext"/></svg>פתיחת חשבון Netlify</a>
+          <div class="addr"><span>כתובת האתר:</span><code dir="ltr">app.netlify.com/signup</code><button type="button" class="copy" data-copy="https://app.netlify.com/signup"><svg><use href="#i-copy"/></svg>העתקה</button></div>
+        </div>
+      </article>
+
+      <article class="step" data-id="phone">
+        <div class="step-head">
+          <span class="check"><input type="checkbox" id="c-phone" aria-label="גיבוי בטלפון"><svg><use href="#i-tick"/></svg></span>
+          <label class="step-title" for="c-phone"><b>6. גיבוי בטלפון האישי</b><small>אם המחשב נתקע, ממשיכים מהטלפון בלי לאבד זמן.</small></label>
+          <button class="toggle" type="button" aria-expanded="false" aria-label="איך עושים"><svg><use href="#i-chev"/></svg></button>
+        </div>
+        <div class="step-body">
+          <p>בכל השלבים מתחברים עם אותו Gmail אישי:</p>
+          <ol>
+            <li><b>Google Meet:</b> מתקינים את האפליקציה ומתחברים. אחר כך לוחצים על קישור המפגש, ואם הטלפון שואל איך לפתוח, בוחרים באפליקציית Meet.</li>
+            <li><b>Claude:</b> מתקינים את אפליקציית Claude ומתחברים עם Continue with Google.</li>
+            <li><b>Gemini Notebook:</b> מתקינים את האפליקציה, שנקראה בעבר NotebookLM, מתחברים ובודקים שהמחברת שיצרתם מופיעה.</li>
+            <li><b>Netlify:</b> אין אפליקציה. פותחים את האתר בדפדפן של הטלפון ומתחברים עם Google.</li>
+            <li>טלפון טעון ומטען בהישג יד.</li>
+          </ol>
+          <p class="hint">את האפליקציות מוצאים ב-App Store או ב-Google Play לפי השם.</p>
+          <div class="actions">
+            <a class="btn ghost" href="https://meet.google.com/jka-wbva-csu" target="_blank" rel="noopener"><svg><use href="#i-ext"/></svg>קישור המפגש</a>
+            <a class="btn ghost" href="https://app.netlify.com/login" target="_blank" rel="noopener"><svg><use href="#i-ext"/></svg>כניסה ל-Netlify</a>
+          </div>
+          <div class="addr"><span>כתובת האתר:</span><code dir="ltr">meet.google.com/jka-wbva-csu</code><button type="button" class="copy" data-copy="https://meet.google.com/jka-wbva-csu"><svg><use href="#i-copy"/></svg>העתקה</button></div>
+          <div class="addr"><span>כתובת האתר:</span><code dir="ltr">app.netlify.com/login</code><button type="button" class="copy" data-copy="https://app.netlify.com/login"><svg><use href="#i-copy"/></svg>העתקה</button></div>
+        </div>
+      </article>
+
+      <article class="step" data-id="homework">
+        <div class="step-head">
+          <span class="check"><input type="checkbox" id="c-homework" aria-label="שיעורי בית"><svg><use href="#i-tick"/></svg></span>
+          <label class="step-title" for="c-homework"><b>7. שיעורי בית<span class="opt">מומלץ</span></b><small>שתי משימות קטנות שיחסכו זמן ביום עצמו.</small></label>
+          <button class="toggle" type="button" aria-expanded="false" aria-label="איך עושים"><svg><use href="#i-chev"/></svg></button>
+        </div>
+        <div class="step-body">
+          <ol>
+            <li><b>קריאה עצמית, 20 דקות:</b> הורידו למחשב את הדוח של Anthropic על מצב סוכני הבינה בארגונים. הדוח באנגלית, מבוסס על סקר של יותר מ-500 מנהלים טכנולוגיים, ומתאר איפה סוכנים כבר מביאים תועלת ומה מעכב אותם. קראו בעצמכם 20 דקות ורשמו לעצמכם שלוש תובנות. בסדנה נעלה את אותו דוח ל-Gemini Notebook ונשווה: מה הספקתם לבד, ומה הספקתם יחד עם הסוכן.</li>
+            <li><b>בשביל Claude:</b> חשבו על כאב אחד בענף. משהו קטן שחוזר על עצמו ונעשה היום ידנית, באקסל או בוואטסאפ. מי סובל ממנו? איך תדעו שהוא נפתר?</li>
+          </ol>
+          <a class="btn ghost" href="https://resources.anthropic.com/hubfs/State%20of%20AI%20Agents%20Report.pdf?hsLang=en" target="_blank" rel="noopener"><svg><use href="#i-ext"/></svg>הורדת הדוח (PDF, אנגלית)</a>
+          <div class="addr"><span>כתובת האתר:</span><code dir="ltr">resources.anthropic.com/ty-2026-state-of-ai-agents</code><button type="button" class="copy" data-copy="https://resources.anthropic.com/ty-2026-state-of-ai-agents"><svg><use href="#i-copy"/></svg>העתקה</button></div>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="warn" role="note"><span aria-hidden="true">⚠️</span><p><b>חשוב:</b> בסדנה לא מעלים לאף כלי חומר מסווג או מידע אישי. עובדים רק עם חומר גלוי או עם נתוני דוגמה.</p></div>
+  </section>
+
+  <section aria-labelledby="h-finish">
+    <h2 id="h-finish">סיימתם? שלחו לי אישור</h2>
+    <form class="finish" id="finish" novalidate>
+      <div class="fields">
+        <div class="field wide"><label for="f-name">שם מלא</label><input id="f-name" name="name" autocomplete="name" required><span class="err"></span></div>
+        <div class="field wide"><label for="f-gmail">כתובת Gmail אישית, זו שאיתה תיכנסו למפגש</label><input id="f-gmail" name="gmail" type="email" dir="ltr" inputmode="email" autocomplete="email" placeholder="name@gmail.com" required><span class="err"></span></div>
+        <div class="field wide"><label for="f-pain">הכאב שבחרתי לסדנה (לא חובה)</label><textarea id="f-pain" name="pain" placeholder="למשל: חיזוק השליטה בשפה ובתרבות הערבית בענף שלי"></textarea></div>
+      </div>
+      <div class="confirm locked" id="confirm-row">
+        <span class="check"><input type="checkbox" id="f-confirm" disabled><svg><use href="#i-tick"/></svg></span>
+        <label for="f-confirm" id="confirm-label">אני מאשר/ת שהשלמתי את כל ההכנות</label>
+      </div>
+      <p class="hint" id="lock-hint">הסימון ייפתח אחרי שתסמנו את שלבים 1–6 ברשימה.</p>
+      <button class="btn wa" type="submit" id="send" disabled><svg><use href="#i-wa"/></svg>שליחת אישור בוואטסאפ</button>
+      <p class="hint">הכפתור פותח וואטסאפ עם הודעה מוכנה. נשאר רק ללחוץ "שלח".</p>
+      <div class="done-box" id="done" role="status">
+        <h3>מעולה, נתראה ביום שלישי! 🎉</h3>
+        <p>לא נפתח וואטסאפ, או שלא לחצתם "שלח"? <a href="#" id="resend">לחצו כאן לפתוח שוב</a>.</p>
+        <div class="actions">
+          <a class="btn primary" href="https://calendar.app.google/tiDi7Cqdo2EDg98r5" target="_blank" rel="noopener"><svg><use href="#i-cal"/></svg>אישור הגעה ביומן</a>
+          <a class="btn ghost" href="https://meet.google.com/jka-wbva-csu" target="_blank" rel="noopener"><svg><use href="#i-video"/></svg>קישור למפגש</a>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <footer class="closing">
+    <p><b>נתקעתם באחד השלבים?</b> כתבו לי בוואטסאפ ונסדר את זה ביחד.</p>
+    <a class="btn ghost" href="https://wa.me/972504604724?text=%D7%94%D7%99%D7%99%2C%20%D7%A0%D7%AA%D7%A7%D7%A2%D7%AA%D7%99%20%D7%91%D7%94%D7%9B%D7%A0%D7%95%D7%AA%20%D7%9C%D7%A1%D7%93%D7%A0%D7%94%3A%20" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>עזרה בוואטסאפ</a>
+  </footer>
+
+</main>
+
+<script>
+(function () {
+  var WA_NUMBER = '972504604724';
+  var WORKSHOP = new Date('2026-11-03T08:50:00+02:00');
+  var WORKSHOP_END = new Date('2026-11-03T15:00:00+02:00');
+  var KEY = 'workshop-prep-2026-11-03';
+  var REQUIRED = ['computer', 'gmail', 'notebook', 'claude', 'netlify', 'phone'];
+  var LABELS = { computer: 'מחשב', gmail: 'Gmail ו-Meet', notebook: 'Gemini Notebook', claude: 'Claude', netlify: 'Netlify', phone: 'גיבוי בטלפון', homework: 'שיעורי בית' };
+
+  function load() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  var state = load();
+  state.steps = state.steps || {};
+  state.form = state.form || {};
+
+  // Countdown
+  var cd = document.getElementById('countdown');
+  function tick() {
+    var now = new Date();
+    var ms = WORKSHOP - now;
+    if (now > WORKSHOP_END) { cd.textContent = 'הסדנה התקיימה. תודה שהשתתפתם!'; return; }
+    if (ms <= 0) { cd.textContent = 'הסדנה מתקיימת עכשיו. הצטרפו למפגש!'; return; }
+    var days = Math.floor(ms / 86400000);
+    var hours = Math.floor((ms % 86400000) / 3600000);
+    if (days > 1) cd.textContent = 'עוד ' + days + ' ימים לסדנה';
+    else if (days === 1) cd.textContent = 'הסדנה מחר ב-08:50';
+    else cd.textContent = hours > 0 ? 'הסדנה מתחילה בעוד ' + hours + ' שעות' : 'הסדנה מתחילה בעוד פחות משעה';
+  }
+  tick(); setInterval(tick, 60000);
+
+  // On Android an installed app can capture the link; send it to Chrome explicitly so it opens as a website
+  if (/Android/i.test(navigator.userAgent)) {
+    document.querySelectorAll('a[data-browser-only]').forEach(function (a) {
+      var u = new URL(a.href);
+      a.href = 'intent://' + u.host + u.pathname + u.search + '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=' + encodeURIComponent(u.href) + ';end';
+      a.removeAttribute('target');
+    });
+  }
+
+  // Copy buttons: exact site address for typing it into the address bar if a link misbehaves
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text).catch(function () { return legacyCopy(text); });
+    return legacyCopy(text);
+  }
+  function legacyCopy(text) {
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy') ? resolve() : reject(); } catch (e) { reject(e); }
+      document.body.removeChild(ta);
+    });
+  }
+  document.querySelectorAll('.copy').forEach(function (btn) {
+    var label = btn.innerHTML;
+    btn.addEventListener('click', function () {
+      copyText(btn.dataset.copy).then(function () {
+        btn.classList.add('ok'); btn.textContent = 'הועתק ✓';
+      }, function () {
+        // Clipboard blocked: select the address so the viewer can copy it themselves
+        var range = document.createRange();
+        range.selectNodeContents(btn.parentNode.querySelector('code'));
+        var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+        btn.textContent = 'הכתובת סומנה, העתיקו ידנית';
+      });
+      setTimeout(function () { btn.classList.remove('ok'); btn.innerHTML = label; }, 2200);
+    });
+  });
+
+  // Checklist
+  var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
+  var confirmBox = document.getElementById('f-confirm');
+  var confirmRow = document.getElementById('confirm-row');
+  var lockHint = document.getElementById('lock-hint');
+  var sendBtn = document.getElementById('send');
+
+  function requiredDone() { return REQUIRED.every(function (id) { return !!state.steps[id]; }); }
+
+  function render() {
+    var done = 0;
+    steps.forEach(function (el) {
+      var on = !!state.steps[el.dataset.id];
+      el.classList.toggle('done', on);
+      el.querySelector('input').checked = on;
+      if (on) done++;
+    });
+    document.getElementById('prog-text').textContent = done + ' מתוך ' + steps.length + ' הושלמו';
+    document.getElementById('prog-bar').style.width = (done / steps.length * 100) + '%';
+    var ready = requiredDone();
+    document.getElementById('prog-note').textContent = ready ? 'כל שלבי החובה הושלמו ✓' : 'שלבים 1–6 חובה';
+    confirmBox.disabled = !ready;
+    if (!ready) { confirmBox.checked = false; state.form.confirm = false; }
+    confirmRow.classList.toggle('locked', !ready);
+    lockHint.style.display = ready ? 'none' : '';
+    sendBtn.disabled = !(ready && confirmBox.checked);
+  }
+
+  steps.forEach(function (el) {
+    var input = el.querySelector('input');
+    var toggle = el.querySelector('.toggle');
+    input.addEventListener('change', function () {
+      state.steps[el.dataset.id] = input.checked;
+      save(); render();
+    });
+    toggle.addEventListener('click', function () {
+      var open = el.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  // Open the first unfinished step so the next action is visible
+  var firstOpen = steps.filter(function (el) { return !state.steps[el.dataset.id]; })[0];
+  if (firstOpen) { firstOpen.classList.add('open'); firstOpen.querySelector('.toggle').setAttribute('aria-expanded', 'true'); }
+
+  // Form
+  var form = document.getElementById('finish');
+  var fields = { name: 'f-name', gmail: 'f-gmail', pain: 'f-pain' };
+  Object.keys(fields).forEach(function (k) {
+    var el = document.getElementById(fields[k]);
+    if (state.form[k]) el.value = state.form[k];
+    el.addEventListener('input', function () {
+      state.form[k] = el.value; save();
+      el.closest('.field').classList.remove('bad');
+      el.closest('.field').querySelector('.err') && (el.closest('.field').querySelector('.err').textContent = '');
+    });
+  });
+  confirmBox.checked = !!state.form.confirm;
+  confirmBox.addEventListener('change', function () { state.form.confirm = confirmBox.checked; save(); render(); });
+
+  function setErr(id, msg) {
+    var f = document.getElementById(id).closest('.field');
+    f.classList.add('bad'); f.querySelector('.err').textContent = msg;
+  }
+
+  function buildMessage() {
+    var f = state.form;
+    var lines = [
+      '✅ סיום הכנות לסדנה: הפקה בעידן סוכני הבינה (3.11)',
+      '',
+      'שם: ' + f.name.trim(),
+      'Gmail: ' + f.gmail.trim().toLowerCase(),
+      '',
+      REQUIRED.map(function (id) { return LABELS[id] + ' ✔'; }).join(' | '),
+      'שיעורי בית: ' + (state.steps.homework ? '✔' : '✖')
+    ];
+    if (f.pain && f.pain.trim()) lines.push('הכאב שבחרתי: ' + f.pain.trim());
+    return lines.join('\n');
+  }
+
+  function openWhatsApp() {
+    var url = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(buildMessage());
+    var w = window.open(url, '_blank');
+    if (!w) location.href = url;
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var ok = true;
+    var name = document.getElementById('f-name').value.trim();
+    var gmail = document.getElementById('f-gmail').value.trim();
+    if (!name) { setErr('f-name', 'נא למלא שם'); ok = false; }
+    if (!/^[^\s@]+@(gmail|googlemail)\.com$/i.test(gmail)) { setErr('f-gmail', 'נדרשת כתובת Gmail, למשל name@gmail.com'); ok = false; }
+    if (!ok) { form.querySelector('.bad input').focus(); return; }
+    if (!requiredDone() || !confirmBox.checked) return;
+    state.form.name = name; state.form.gmail = gmail; state.form.sent = true; save();
+    openWhatsApp();
+    document.getElementById('done').classList.add('show');
+  });
+
+  document.getElementById('resend').addEventListener('click', function (e) { e.preventDefault(); openWhatsApp(); });
+
+  if (state.form.sent) document.getElementById('done').classList.add('show');
+  render();
+})();
+</script>
+</body>
+</html>
