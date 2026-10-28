@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>הכנות לסדנה</title>
-<meta name="description" content="הפקה בעידן סוכני הבינה · יום שלישי 3.11 · מה נעשה ומה להכין מראש">
+<meta name="description" content="הפקה בעידן סוכני הבינה · יום שני 2.11 · מה נעשה ומה להכין מראש">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;700&display=swap">
@@ -193,7 +193,7 @@
     <h1>הפקה בעידן סוכני הבינה</h1>
     <p class="lead">צ'אטבוט מסביר איך עושים. סוכן עושה. בסדנה נעבוד עם שני סוכנים, Gemini Notebook ו-Claude, ונראה איך שיתוף הפעולה אדם ← מכונה ← אדם משדרג את העבודה שלנו.</p>
     <div class="facts">
-      <span class="fact"><svg><use href="#i-cal"/></svg>יום שלישי, 3 בנובמבר 2026</span>
+      <span class="fact"><svg><use href="#i-cal"/></svg>יום שני, 2 בנובמבר 2026</span>
       <span class="fact"><svg><use href="#i-clock"/></svg><span dir="ltr">08:50–15:00</span></span>
       <span class="fact"><svg><use href="#i-video"/></svg>Google Meet, מהג'ימייל האישי</span>
     </div>
@@ -411,7 +411,7 @@
       <button class="btn wa" type="submit" id="send" disabled><svg><use href="#i-wa"/></svg>שליחת אישור בוואטסאפ</button>
       <p class="hint">הכפתור פותח וואטסאפ עם הודעה מוכנה, ונשאר רק ללחוץ "שלח". שלחו מהטלפון הפרטי או מהמחשב הפרטי, כדי שהאישור יגיע מהוואטסאפ הפרטי.</p>
       <div class="done-box" id="done" role="status">
-        <h3>מעולה, נתראה ביום שלישי! 🎉</h3>
+        <h3>מעולה, נתראה ביום שני! 🎉</h3>
         <p>לא נפתח וואטסאפ, או שלא לחצתם "שלח"? <a href="#" id="resend">לחצו כאן לפתוח שוב</a>.</p>
         <div class="actions">
           <a class="btn primary" href="https://calendar.app.google/tiDi7Cqdo2EDg98r5" target="_blank" rel="noopener"><svg><use href="#i-cal"/></svg>אישור הגעה ביומן</a>
@@ -431,8 +431,8 @@
 <script>
 (function () {
   var WA_NUMBER = '972504604724';
-  var WORKSHOP = new Date('2026-11-03T08:50:00+02:00');
-  var WORKSHOP_END = new Date('2026-11-03T15:00:00+02:00');
+  var WORKSHOP = new Date('2026-11-02T08:50:00+02:00');
+  var WORKSHOP_END = new Date('2026-11-02T15:00:00+02:00');
   var KEY = 'workshop-prep-2026-11-03';
   var REQUIRED = ['computer', 'gmail', 'notebook', 'claude', 'netlify', 'phone'];
   var LABELS = { computer: 'מחשב', gmail: 'Gmail ו-Meet', notebook: 'Gemini Notebook', claude: 'Claude', netlify: 'Netlify', phone: 'גיבוי בטלפון', homework: 'שיעורי בית' };
@@ -572,7 +572,7 @@
   function buildMessage() {
     var f = state.form;
     var lines = [
-      '✅ סיום הכנות לסדנה: הפקה בעידן סוכני הבינה (3.11)',
+      '✅ סיום הכנות לסדנה: הפקה בעידן סוכני הבינה (2.11)',
       '',
       'שם: ' + f.name.trim(),
       'Gmail: ' + f.gmail.trim().toLowerCase(),
