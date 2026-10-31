@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>מה החדר אומר</title>
-<meta name="description" content="תוצאות חיות של סקר סיום הסדנה, להקרנה במליאה">
+<title>מה לקחנו מהיום</title>
+<meta name="description" content="תוצאות סקר סיום הסדנה, להקרנה במליאה: המתנה לתשובות, ספירה לאחור וחשיפה בשלבים">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +12,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="survey-config.js"></script>
 <style>
-  /* Layout: a projection screen. Header strip (title, live counter, QR to answer), then a 3x2 grid of tiles that fills the viewport on wide screens and stacks on phones. Dark by default, since it is shown on a projector. Same tokens as survey.html. */
+  /* Layout: a projection screen in three phases. Wait: big QR beside a progress ring (answers out of expected), results hidden. Countdown: full-screen 3-2-1. Reveal: 3x2 grid of tiles, uncovered one at a time by the presenter (space / clicker); live updates continue. Dark by default for projectors. Same tokens as survey.html. */
   :root {
     --bg: #F3F4F1; --surface: #FFFFFF; --sunk: #EEF0EC; --ink: #17212B; --muted: #55606B;
     --line: #DCE0DA; --line2: #9AA3AC; --accent: #1E4FA8; --accent-2: #8EB0F2; --on-accent: #FFFFFF; --accent-soft: #E3EBF8;
@@ -143,13 +143,58 @@
   .empty b { display: block; font-family: var(--display); color: var(--ink); font-size: 1.1em; margin-bottom: .2em; }
 
   /* Waiting state */
-  .wait { flex: 1; display: grid; place-items: center; text-align: center; }
-  .wait .inner { display: flex; flex-direction: column; align-items: center; gap: 1em; }
-  .wait .box { width: min(42vh, 320px); height: min(42vh, 320px); background: #FFFFFF; border-radius: 1em; padding: 1em; }
-  .wait .box svg { width: 100%; height: 100%; display: block; }
-  .wait h2 { font-size: clamp(24px, 3vw, 44px); }
-  .wait p { color: var(--muted); font-size: 1.1em; }
-  .wait code { font-family: var(--font); color: var(--accent); direction: ltr; unicode-bidi: isolate; }
+  .wait { flex: 1; min-height: 0; display: grid; place-items: center; }
+  .wait .inner { display: grid; grid-template-columns: auto auto; align-items: center; gap: clamp(24px, 5vw, 96px); }
+  @media (max-width: 760px) { .wait .inner { grid-template-columns: 1fr; justify-items: center; text-align: center; } }
+  .scan { display: flex; flex-direction: column; align-items: center; gap: .8em; text-align: center; }
+  .scan .box { width: min(40vh, 300px); height: min(40vh, 300px); background: #FFFFFF; border-radius: 1em; padding: 1em; }
+  .scan .box svg { width: 100%; height: 100%; display: block; }
+  .scan h2 { font-size: clamp(20px, 2.2vw, 34px); }
+  .scan p { color: var(--muted); }
+  .scan code { font-family: var(--font); color: var(--accent); direction: ltr; unicode-bidi: isolate; }
+  .prog { display: flex; flex-direction: column; align-items: center; gap: 1em; text-align: center; }
+  .ring { position: relative; width: min(38vh, 280px); height: min(38vh, 280px); }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring circle { fill: none; stroke-width: 9; }
+  .ring .trk { stroke: var(--sunk); }
+  .ring .arc { stroke: var(--accent); stroke-linecap: round; transition: stroke-dashoffset .8s var(--ease), stroke .4s; }
+  .ring.full .arc { stroke: var(--ok); }
+  .ring .mid { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ring .mid b { font-family: var(--display); font-size: clamp(56px, 7vw, 120px); line-height: 1; font-weight: 700; }
+  .ring .mid span { color: var(--muted); font-weight: 600; font-size: 1.05em; }
+  .ring.bump .mid b { animation: bump .45s var(--ease); }
+  @keyframes bump { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
+  .status { font-family: var(--display); font-weight: 700; font-size: clamp(18px, 1.8vw, 28px); min-height: 1.3em; }
+  .status.done { color: var(--ok); }
+  .expect { display: inline-flex; align-items: center; gap: .5em; color: var(--muted); font-size: .9em; }
+  .expect input { width: 4.2em; font: 700 1em/1 var(--display); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: .5em; padding: .35em .4em; text-align: center; }
+  .expect input:focus { outline: 3px solid var(--accent); outline-offset: 1px; }
+  .go { display: inline-flex; align-items: center; gap: .6em; min-height: 3em; padding: 0 1.6em; border-radius: 999px; border: 0; background: var(--accent); color: var(--on-accent); font: 700 1.1em/1 var(--display); cursor: pointer; transition: transform .2s var(--ease), box-shadow .2s var(--ease), opacity .2s; }
+  .go:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0, 0, 0, .25); }
+  .go[disabled] { opacity: .4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .keys { color: var(--muted); font-size: .78em; }
+  kbd { font: 600 .9em/1 var(--font); border: 1px solid var(--line2); border-radius: 5px; padding: 2px 6px; color: var(--muted); }
+
+  /* Countdown */
+  .cd { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px); }
+  .cd b { font-family: var(--display); font-weight: 700; font-size: min(42vh, 36vw); line-height: 1; color: var(--accent); animation: tick 1s var(--ease) both; }
+  @keyframes tick { 0% { opacity: 0; transform: scale(1.7); } 25% { opacity: 1; transform: scale(1); } 80% { opacity: 1; transform: scale(.96); } 100% { opacity: 0; transform: scale(.8); } }
+
+  /* Step-by-step reveal */
+  .tile.veiled { background: var(--sunk); border-style: dashed; }
+  .tile.veiled > *:not(h2) { visibility: hidden; }
+  .tile.veiled h2 { opacity: .5; }
+  .tile.veiled::after { content: attr(data-step); position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--display); font-weight: 700; font-size: clamp(48px, 5vw, 96px); color: var(--line2); opacity: .5; pointer-events: none; }
+  .tile.nexttile { border-color: var(--accent); border-style: solid; box-shadow: 0 0 0 1px var(--accent) inset; }
+  .tile.nexttile::after { color: var(--accent); opacity: .8; }
+  .tile.pop > *:not(h2) { animation: rise .6s var(--ease) both; }
+  .tile.pop .sg, .tile.pop .bar .fillb { animation: grow .9s var(--ease) both; transform-origin: right center; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  .stepper { display: inline-flex; align-items: center; gap: .5em; }
+  .stepper .go { min-height: 2.4em; padding: 0 1.1em; font-size: .9em; }
+  .stepper .ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+  .stepper .pos { font-family: var(--display); font-weight: 700; color: var(--muted); font-size: .9em; min-width: 2.6em; text-align: center; }
   @media (prefers-reduced-motion: reduce) { * { animation-duration: .01s !important; transition-duration: .01s !important; } }
 </style>
 </head>
@@ -163,12 +208,17 @@
   <header class="top">
     <div class="brand">
       <span class="k">סקר סיום · הפקה בעידן סוכני הבינה</span>
-      <h1>מה החדר אומר</h1>
+      <h1 id="title">עוד רגע נגלה מה חשבתם</h1>
     </div>
     <div class="meta">
-      <div class="count"><b class="num" id="n">0</b><span>תשובות</span></div>
+      <div class="count" id="hcount" hidden><b class="num" id="n">0</b><span>תשובות</span></div>
       <div class="live"><span class="dot" id="dot"></span><span id="upd">מתחבר...</span></div>
-      <div class="qr"><div class="box" id="qr" aria-hidden="true"></div><div><b>עדיין לא עניתם?</b><small>סרקו, או פתחו את הקישור מהצ'אט.</small></div></div>
+      <div class="qr" id="hqr" hidden><div class="box" id="qr" aria-hidden="true"></div><div><b>עדיין לא עניתם?</b><small>סרקו, או פתחו את הקישור מהצ'אט.</small></div></div>
+      <div class="stepper" id="stepper" hidden>
+        <button class="go ghost" id="all" type="button">הכול</button>
+        <span class="pos num" id="pos"></span>
+        <button class="go" id="next" type="button">הבא</button>
+      </div>
       <div class="tools">
         <button class="ib" id="theme" type="button" aria-label="מצב בהיר/כהה"><svg><use href="#i-sun"/></svg></button>
         <button class="ib" id="fs" type="button" aria-label="מסך מלא"><svg><use href="#i-full"/></svg></button>
@@ -178,14 +228,26 @@
 
   <section class="wait" id="wait">
     <div class="inner">
-      <div class="box" id="qr-big" aria-hidden="true"></div>
-      <h2>ממתינים לתשובות הראשונות</h2>
-      <p>סרקו את הקוד, או פתחו: <code id="url"></code></p>
+      <div class="scan">
+        <div class="box" id="qr-big" aria-hidden="true"></div>
+        <h2>סרקו וענו על הסקר</h2>
+        <p>או פתחו: <code id="url"></code></p>
+      </div>
+      <div class="prog">
+        <div class="ring" id="ring">
+          <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="trk" cx="60" cy="60" r="54"/><circle class="arc" id="arc" cx="60" cy="60" r="54" stroke-dasharray="339.3" stroke-dashoffset="339.3"/></svg>
+          <div class="mid"><b class="num" id="wn">0</b><span id="wof">ענו עד עכשיו</span></div>
+        </div>
+        <p class="status" id="status" aria-live="polite"></p>
+        <label class="expect">כמה משתתפים בסדנה? <input id="expected" type="number" min="1" max="300" inputmode="numeric" placeholder="?"></label>
+        <button class="go" id="reveal" type="button" disabled>חשיפת התוצאות</button>
+        <p class="keys">או מקש <kbd>רווח</kbd>. אחרי החשיפה: <kbd>רווח</kbd> למשבצת הבאה</p>
+      </div>
     </div>
   </section>
 
   <main class="grid" id="grid" hidden>
-    <section class="tile hero">
+    <section class="tile hero" data-step="1">
       <h2>היו ממליצים למנהל עמית? <small>ציון NPS</small></h2>
       <div class="body">
         <div class="big num"><span id="nps">–</span><small id="nps-note"></small></div>
@@ -195,7 +257,7 @@
       </div>
     </section>
 
-    <section class="tile">
+    <section class="tile" data-step="2">
       <h2>איזו התנסות הכי שימושית, מול מה שינסו השבוע</h2>
       <div class="body">
         <div class="legend"><span><i style="background:var(--accent)"></i>הכי שימושי</span><span><i style="background:var(--accent-2)"></i>ינסו כבר השבוע</span></div>
@@ -203,7 +265,7 @@
       </div>
     </section>
 
-    <section class="tile">
+    <section class="tile" data-step="3">
       <h2>כמה בטוחים שיצליחו לבד <small>1 עד 5</small></h2>
       <div class="body">
         <div class="rows" id="conf"></div>
@@ -211,7 +273,7 @@
       </div>
     </section>
 
-    <section class="tile">
+    <section class="tile" data-step="4">
       <h2>קצב, רמה והמבוא</h2>
       <div class="body">
         <div class="mini">
@@ -222,7 +284,7 @@
       </div>
     </section>
 
-    <section class="tile">
+    <section class="tile" data-step="5">
       <h2>במילים שלהם</h2>
       <div class="cols">
         <div class="col keep"><h3><i></i>לשמור</h3><div id="keep"></div></div>
@@ -231,7 +293,7 @@
       <div class="empty" id="quotes-empty" hidden><div><b>עוד אין הערות פתוחות</b>הן יופיעו כאן ברגע שייכתבו.</div></div>
     </section>
 
-    <section class="tile">
+    <section class="tile" data-step="6">
       <h2>ההתחייבויות לשבוע <small id="commit-n"></small></h2>
       <div class="body">
         <div class="pills" id="commit-pills"></div>
@@ -241,6 +303,7 @@
     </section>
   </main>
 </div>
+<div class="cd" id="cd" hidden aria-live="assertive"></div>
 
 <script>
 (function () {
@@ -296,8 +359,9 @@
     }
     return rows;
   }
+  var demoShown = 0;
   function fetchRows() {
-    if (DEMO) return Promise.resolve(demoRows());
+    if (DEMO) { demoShown = Math.min(19, demoShown + 2); return Promise.resolve(demoRows().slice(0, demoShown)); }
     if (!cfg.endpoint) return Promise.reject(new Error('no endpoint'));
     return fetch(cfg.endpoint + '?token=' + encodeURIComponent(cfg.token) + '&t=' + Date.now(), { redirect: 'follow', cache: 'no-store' })
       .then(function (r) { return r.json(); })
@@ -322,8 +386,7 @@
   function render(rows) {
     var n = rows.length;
     $('n').textContent = n;
-    $('wait').hidden = n > 0;
-    $('grid').hidden = n === 0;
+    updateWait(n);
     if (!n) return;
 
     // NPS
@@ -331,7 +394,8 @@
     var m = npsVals.length, det = 0, pas = 0, pro = 0, sum = 0;
     npsVals.forEach(function (v) { sum += v; if (v >= 9) pro++; else if (v >= 7) pas++; else det++; });
     var nps = m ? Math.round(pct(pro, m) - pct(det, m)) : 0;
-    $('nps').textContent = (nps > 0 ? '+' : '') + nps;
+    lastNps = nps;
+    if (!npsAnimating) $('nps').textContent = (nps > 0 ? '+' : '') + nps;
     $('nps-note').textContent = m < 5 ? 'מוקדם לקבוע (' + m + ' תשובות)' : (nps >= 50 ? 'מצוין' : nps >= 20 ? 'טוב' : nps >= 0 ? 'סביר' : 'צריך לדבר');
     var npsParts = [{ cls: 'neg2', k: det, label: 'מפזרים (0 עד 6)' }, { cls: 'mid', k: pas, label: 'ניטרליים (7 עד 8)' }, { cls: 'pos2', k: pro, label: 'ממליצים (9 עד 10)' }];
     segs($('nps-bar'), npsParts, m);
@@ -404,6 +468,126 @@
     $('commit-empty').hidden = !!com.length;
   }
 
+  /* ---------- Phases: wait, countdown, reveal ---------- */
+  var TILES = [].slice.call(document.querySelectorAll('#grid .tile'));
+  var STEPS = TILES.length;
+  var phase = 'wait', shown = 0, count = 0, lastNps = 0, npsAnimating = false;
+  function ss(k, v) { try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch (e) { return null; } }
+  function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+
+  var qn = (location.search.match(/[?&]n=(\d+)/) || [])[1];
+  var expected = Number(qn || ls('survey-expected') || 0) || 0;
+  if (expected) $('expected').value = expected;
+  $('expected').addEventListener('input', function () {
+    expected = Math.max(0, Math.min(300, Number(this.value) || 0));
+    ls('survey-expected', String(expected || ''));
+    updateWait(count);
+  });
+
+  var CIRC = 339.3, prevCount = -1;
+  function updateWait(n) {
+    count = n;
+    var ring = $('ring');
+    $('wn').textContent = n;
+    $('wof').textContent = expected ? 'מתוך ' + expected + ' ענו' : 'ענו עד עכשיו';
+    var frac = expected ? Math.min(1, n / expected) : (n ? 1 : 0);
+    $('arc').setAttribute('stroke-dashoffset', String(CIRC * (1 - frac)));
+    var full = !!expected && n >= expected;
+    ring.classList.toggle('full', full);
+    if (prevCount !== -1 && n > prevCount) { ring.classList.remove('bump'); void ring.offsetWidth; ring.classList.add('bump'); }
+    prevCount = n;
+    var st = $('status');
+    st.classList.toggle('done', full);
+    if (!n) st.textContent = 'ממתינים לתשובות הראשונות';
+    else if (full) st.textContent = 'כולם ענו. אפשר לחשוף.';
+    else if (expected) st.textContent = 'עוד ' + (expected - n) + ' לפני החשיפה';
+    else st.textContent = 'התשובות נכנסות';
+    $('reveal').disabled = !n;
+  }
+
+  function setPhase(p) {
+    phase = p;
+    ss('results-phase', p);
+    var waiting = p === 'wait';
+    $('wait').hidden = !waiting;
+    $('grid').hidden = waiting;
+    $('hcount').hidden = waiting;
+    $('hqr').hidden = waiting;
+    $('stepper').hidden = p !== 'reveal';
+    $('title').textContent = waiting ? 'עוד רגע נגלה מה חשבתם' : 'מה לקחנו מהיום';
+    if (p === 'reveal') applySteps(-1);
+  }
+
+  // The entrance animation plays once; the class is removed so the 8-second refresh does not replay it
+  function popTile(t) { t.classList.remove('pop'); void t.offsetWidth; t.classList.add('pop'); clearTimeout(t._pop); t._pop = setTimeout(function () { t.classList.remove('pop'); }, 1300); }
+  function applySteps(popIndex) {
+    TILES.forEach(function (t, i) {
+      t.classList.toggle('veiled', i >= shown);
+      t.classList.toggle('nexttile', i === shown);
+      if (i === popIndex) popTile(t);
+    });
+    $('pos').textContent = shown + '/' + STEPS;
+    $('next').disabled = shown >= STEPS;
+    $('all').disabled = shown >= STEPS;
+    ss('results-shown', String(shown));
+    if (popIndex === 0) countUpNps();
+  }
+  function next() { if (phase !== 'reveal' || shown >= STEPS) return; shown++; applySteps(shown - 1); }
+  function prev() { if (phase !== 'reveal' || shown <= 0) return; shown--; applySteps(-1); }
+  function all() {
+    if (phase !== 'reveal' || shown >= STEPS) return;
+    var from = shown; shown = STEPS;
+    TILES.forEach(function (t, i) { if (i > from) popTile(t); });
+    applySteps(from);
+  }
+
+  function countUpNps() {
+    var el = $('nps'), t0 = performance.now(), dur = 900;
+    npsAnimating = true;
+    function f(t) {
+      var k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3), v = Math.round(lastNps * e);
+      el.textContent = (v > 0 ? '+' : '') + v;
+      if (k < 1) requestAnimationFrame(f); else { npsAnimating = false; el.textContent = (lastNps > 0 ? '+' : '') + lastNps; }
+    }
+    requestAnimationFrame(f);
+  }
+
+  var counting = false;
+  function startCountdown() {
+    if (phase !== 'wait' || !count || counting) return;
+    counting = true;
+    var cd = $('cd'), seq = ['3', '2', '1'], i = 0;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    cd.hidden = false;
+    (function step() {
+      if (i < seq.length) { cd.innerHTML = '<b>' + seq[i] + '</b>'; i++; setTimeout(step, reduce ? 250 : 1000); return; }
+      cd.hidden = true; cd.innerHTML = ''; counting = false;
+      shown = 0; setPhase('reveal'); next();
+    })();
+  }
+  $('reveal').addEventListener('click', startCountdown);
+  $('next').addEventListener('click', next);
+  $('all').addEventListener('click', all);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = e.key;
+    if (phase === 'wait') {
+      if (k === ' ' || k === 'Enter' || k === 'PageDown') { e.preventDefault(); startCountdown(); }
+      return;
+    }
+    if (k === ' ' || k === 'Enter' || k === 'ArrowLeft' || k === 'PageDown' || k === 'ArrowDown') { e.preventDefault(); next(); }
+    else if (k === 'ArrowRight' || k === 'PageUp' || k === 'ArrowUp' || k === 'Backspace') { e.preventDefault(); prev(); }
+    else if (k === 'a' || k === 'A' || k === 'ש') { all(); }
+    else if (k === 'r' || k === 'R' || k === 'ר') { shown = 0; setPhase('wait'); updateWait(count); }
+  });
+
+  // An accidental reload in the same tab keeps the reveal where it was
+  if (ss('results-phase') === 'reveal') { shown = Number(ss('results-shown')) || 0; setPhase('reveal'); }
+  else setPhase('wait');
+  updateWait(0);
+
   /* ---------- Polling ---------- */
   var last = 0, ok = true;
   function tickLabel() {
@@ -419,7 +603,7 @@
       .finally(tickLabel);
   }
   refresh();
-  setInterval(refresh, Math.max(4, cfg.refreshSeconds || 8) * 1000);
+  setInterval(refresh, DEMO ? 2500 : Math.max(4, cfg.refreshSeconds || 8) * 1000);
   setInterval(tickLabel, 1000);
 })();
 </script>
