@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="he" dir="rtl" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>מה החדר אומר</title>
+<meta name="description" content="תוצאות חיות של סקר סיום הסדנה, להקרנה במליאה">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="survey-config.js"></script>
+<style>
+  /* Layout: a projection screen. Header strip (title, live counter, QR to answer), then a 3x2 grid of tiles that fills the viewport on wide screens and stacks on phones. Dark by default, since it is shown on a projector. Same tokens as survey.html. */
+  :root {
+    --bg: #F3F4F1; --surface: #FFFFFF; --sunk: #EEF0EC; --ink: #17212B; --muted: #55606B;
+    --line: #DCE0DA; --line2: #9AA3AC; --accent: #1E4FA8; --accent-2: #8EB0F2; --on-accent: #FFFFFF; --accent-soft: #E3EBF8;
+    --warm: #A9480C; --ok: #2F6B3F;
+    --neg2: #A9480C; --neg1: #D27F42; --mid: #AEB5BC; --pos1: #4FA86C; --pos2: #2F6B3F;
+    --glow: rgba(30, 79, 168, .12);
+    --font: Assistant, "Segoe UI", Arial, sans-serif;
+    --display: Rubik, Assistant, "Segoe UI", Arial, sans-serif;
+    --ease: cubic-bezier(.2, .8, .2, 1);
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F141A; --surface: #1B222A; --sunk: #151B21; --ink: #EEF1F4; --muted: #A7B0BA;
+    --line: #2C3640; --line2: #56636F; --accent: #8EB0F2; --accent-2: #3F65A6; --on-accent: #0E1620; --accent-soft: #1E2A3D;
+    --warm: #F0A464; --ok: #86C79A;
+    --neg2: #F0A464; --neg1: #B86F36; --mid: #56636F; --pos1: #4F9A68; --pos2: #86C79A;
+    --glow: rgba(142, 176, 242, .14);
+    color-scheme: dark;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: clamp(14px, 1.15vw, 20px); line-height: 1.45; }
+  body::before { content: ""; position: fixed; inset: -30% auto auto -10%; width: 60vw; height: 60vw; background: radial-gradient(closest-side, var(--glow), transparent 70%); pointer-events: none; }
+  h1, h2, h3 { font-family: var(--display); margin: 0; }
+  p { margin: 0; }
+  button { font: inherit; color: inherit; }
+  [hidden] { display: none !important; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  .page { position: relative; min-height: 100dvh; display: flex; flex-direction: column; gap: 1.2em; padding: 1.2em 1.6em 1.4em; }
+  @media (min-width: 1100px) { .page { height: 100dvh; overflow: hidden; } }
+
+  /* Header */
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 1.5em; flex-wrap: wrap; }
+  .brand { display: flex; flex-direction: column; gap: .2em; }
+  .brand .k { font-size: .8em; font-weight: 700; letter-spacing: .05em; color: var(--accent); }
+  h1 { font-size: clamp(26px, 3vw, 48px); font-weight: 700; line-height: 1.1; }
+  .meta { display: flex; align-items: center; gap: 1.4em; }
+  .live { display: inline-flex; align-items: center; gap: .5em; font-weight: 700; font-size: .85em; color: var(--muted); }
+  .dot { width: .7em; height: .7em; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 var(--ok); animation: pulse 2s infinite; }
+  .dot.bad { background: var(--warm); animation: none; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 60%, transparent); } 70% { box-shadow: 0 0 0 .6em transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  .count { display: flex; align-items: baseline; gap: .35em; font-family: var(--display); }
+  .count b { font-size: 2.4em; font-weight: 700; line-height: 1; }
+  .count span { color: var(--muted); font-weight: 500; }
+  .qr { display: flex; align-items: center; gap: .8em; background: var(--surface); border: 1px solid var(--line); border-radius: 1em; padding: .5em .8em; }
+  .qr .box { width: 4.6em; height: 4.6em; background: #FFFFFF; border-radius: .5em; padding: .3em; }
+  .qr .box svg { width: 100%; height: 100%; display: block; }
+  .qr small { display: block; font-size: .78em; color: var(--muted); line-height: 1.35; max-width: 11em; }
+  .qr b { font-family: var(--display); font-size: .95em; }
+  .tools { display: flex; gap: .5em; }
+  .ib { width: 2.4em; height: 2.4em; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); cursor: pointer; display: grid; place-items: center; color: var(--muted); transition: color .2s, transform .2s var(--ease); }
+  .ib:hover { color: var(--ink); transform: translateY(-1px); }
+  .ib svg { width: 1.1em; height: 1.1em; }
+
+  /* Grid */
+  .grid { flex: 1; min-height: 0; display: grid; gap: 1em; grid-template-columns: 1fr; }
+  @media (min-width: 760px) { .grid { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 1100px) { .grid { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.25fr) minmax(0, 1.25fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); } }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: 1.2em; padding: 1em 1.2em; display: flex; flex-direction: column; gap: .7em; min-height: 0; overflow: hidden; position: relative; }
+  .tile h2 { flex: none; font-size: 1.05em; font-weight: 700; color: var(--muted); display: flex; justify-content: space-between; align-items: baseline; gap: 1em; }
+  .tile h2 small { font-weight: 500; font-size: .8em; }
+  .body { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: .7em; overflow: hidden; }
+
+  /* Hero */
+  .hero .big { font-family: var(--display); font-weight: 700; font-size: clamp(64px, 6.5vw, 128px); line-height: 1; letter-spacing: -.02em; }
+  .hero .big small { font-size: .32em; color: var(--muted); font-weight: 500; letter-spacing: 0; margin-inline-start: .3em; }
+  .hero .avg { color: var(--muted); font-size: .95em; }
+
+  /* Bars */
+  .hbar { display: flex; gap: 2px; height: 1.25em; border-radius: 4px; overflow: hidden; background: var(--sunk); }
+  .sg { display: flex; align-items: center; justify-content: center; font-size: .72em; font-weight: 700; color: #0E1620; min-width: 0; transition: flex .6s var(--ease); white-space: nowrap; overflow: hidden; }
+  .sg.neg2, .sg.pos2 { color: #FFFFFF; }
+  :root[data-theme="dark"] .sg.neg2, :root[data-theme="dark"] .sg.pos2 { color: #0E1620; }
+  .sg.neg2 { background: var(--neg2); } .sg.neg1 { background: var(--neg1); } .sg.mid { background: var(--mid); } .sg.pos1 { background: var(--pos1); } .sg.pos2 { background: var(--pos2); }
+  .legend { display: flex; flex-wrap: wrap; gap: .4em 1.1em; font-size: .82em; color: var(--muted); }
+  .legend i { display: inline-block; width: .8em; height: .8em; border-radius: 3px; margin-inline-end: .4em; vertical-align: -1px; }
+  .legend b { color: var(--ink); font-weight: 700; }
+
+  .rows { display: flex; flex-direction: column; gap: .55em; }
+  #parts { gap: .4em; }
+  .row { display: flex; flex-direction: column; gap: .3em; }
+  .row .lab { display: flex; justify-content: space-between; gap: 1em; font-weight: 600; font-size: .95em; line-height: 1.25; }
+  .row .lab span:last-child { color: var(--muted); font-weight: 600; }
+  .bars { display: flex; flex-direction: column; gap: 2px; }
+  .bar { display: flex; align-items: center; gap: .5em; }
+  .bar .fillb { height: .8em; max-width: 100%; border-radius: 0 4px 4px 0; transition: width .7s var(--ease); }
+  :root[dir="rtl"] .bar .fillb { border-radius: 4px 0 0 4px; }
+  .bar .v { font-size: .8em; color: var(--muted); white-space: nowrap; }
+  .bar.a .fillb { background: var(--accent); } .bar.b .fillb { background: var(--accent-2); }
+
+  .div { position: relative; height: 1.25em; background: var(--sunk); border-radius: 4px; overflow: hidden; }
+  .div::after { content: ""; position: absolute; top: 0; bottom: 0; inset-inline-start: 50%; width: 2px; background: var(--line2); opacity: .7; }
+  .div .seq { position: absolute; top: 0; bottom: 0; display: flex; gap: 2px; transition: inset-inline-start .7s var(--ease), width .7s var(--ease); }
+  .div .sg { height: 100%; }
+
+  .mini { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
+  .mini .lab { font-weight: 700; margin-bottom: .35em; }
+  .tri { display: flex; gap: 2px; height: 1.25em; border-radius: 4px; overflow: hidden; background: var(--sunk); }
+  .tri .sg.w { background: var(--warm); } .tri .sg.g { background: var(--ok); }
+  :root[data-theme="dark"] .tri .sg { color: #0E1620; }
+  .tri .sg.w { color: #FFFFFF; } :root[data-theme="dark"] .tri .sg.w { color: #0E1620; }
+  .tri + .legend { margin-top: .35em; }
+
+  /* Quotes */
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; flex: 1; min-height: 0; }
+  .col { display: flex; flex-direction: column; gap: .5em; min-height: 0; }
+  .col h3 { font-size: .9em; color: var(--muted); font-weight: 700; display: flex; align-items: center; gap: .4em; }
+  .col h3 i { width: .7em; height: .7em; border-radius: 50%; display: inline-block; }
+  .q { background: var(--sunk); border-radius: .8em; padding: .55em .8em; font-size: .92em; line-height: 1.35; animation: fade .5s var(--ease) both; border-inline-start: 3px solid var(--line2); }
+  .col.keep .q { border-color: var(--ok); } .col.change .q { border-color: var(--warm); }
+  .col.keep h3 i { background: var(--ok); } .col.change h3 i { background: var(--warm); }
+  .more { font-size: .8em; color: var(--muted); }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* Commitments */
+  .pills { display: flex; gap: .5em; flex-wrap: wrap; }
+  .pill { display: inline-flex; align-items: center; gap: .45em; background: var(--sunk); border-radius: 999px; padding: .3em .8em; font-weight: 700; font-size: .9em; }
+  .pill b { font-family: var(--display); color: var(--accent); }
+  .list { display: flex; flex-direction: column; gap: .4em; min-height: 0; overflow: hidden; }
+  .item { display: flex; gap: .6em; align-items: baseline; font-size: .92em; animation: fade .5s var(--ease) both; }
+  .item .t { flex: none; font-weight: 700; color: var(--accent); }
+  .item .m { color: var(--ink); }
+  .item .d { color: var(--muted); flex: none; }
+
+  .empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); text-align: center; padding: 1em; font-size: .95em; background: var(--surface); }
+  .empty b { display: block; font-family: var(--display); color: var(--ink); font-size: 1.1em; margin-bottom: .2em; }
+
+  /* Waiting state */
+  .wait { flex: 1; display: grid; place-items: center; text-align: center; }
+  .wait .inner { display: flex; flex-direction: column; align-items: center; gap: 1em; }
+  .wait .box { width: min(42vh, 320px); height: min(42vh, 320px); background: #FFFFFF; border-radius: 1em; padding: 1em; }
+  .wait .box svg { width: 100%; height: 100%; display: block; }
+  .wait h2 { font-size: clamp(24px, 3vw, 44px); }
+  .wait p { color: var(--muted); font-size: 1.1em; }
+  .wait code { font-family: var(--font); color: var(--accent); direction: ltr; unicode-bidi: isolate; }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: .01s !important; transition-duration: .01s !important; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+</svg>
+
+<div class="page">
+  <header class="top">
+    <div class="brand">
+      <span class="k">סקר סיום · הפקה בעידן סוכני הבינה</span>
+      <h1>מה החדר אומר</h1>
+    </div>
+    <div class="meta">
+      <div class="count"><b class="num" id="n">0</b><span>תשובות</span></div>
+      <div class="live"><span class="dot" id="dot"></span><span id="upd">מתחבר...</span></div>
+      <div class="qr"><div class="box" id="qr" aria-hidden="true"></div><div><b>עדיין לא עניתם?</b><small>סרקו, או פתחו את הקישור מהצ'אט.</small></div></div>
+      <div class="tools">
+        <button class="ib" id="theme" type="button" aria-label="מצב בהיר/כהה"><svg><use href="#i-sun"/></svg></button>
+        <button class="ib" id="fs" type="button" aria-label="מסך מלא"><svg><use href="#i-full"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <section class="wait" id="wait">
+    <div class="inner">
+      <div class="box" id="qr-big" aria-hidden="true"></div>
+      <h2>ממתינים לתשובות הראשונות</h2>
+      <p>סרקו את הקוד, או פתחו: <code id="url"></code></p>
+    </div>
+  </section>
+
+  <main class="grid" id="grid" hidden>
+    <section class="tile hero">
+      <h2>היו ממליצים למנהל עמית? <small>ציון NPS</small></h2>
+      <div class="body">
+        <div class="big num"><span id="nps">–</span><small id="nps-note"></small></div>
+        <div class="hbar" id="nps-bar" title="מפזרים 0 עד 6, ניטרליים 7 עד 8, ממליצים 9 עד 10"></div>
+        <div class="legend" id="nps-leg"></div>
+        <p class="avg" id="nps-avg"></p>
+      </div>
+    </section>
+
+    <section class="tile">
+      <h2>הכי שימושי היום, מול מה שינסו השבוע</h2>
+      <div class="body">
+        <div class="legend"><span><i style="background:var(--accent)"></i>הכי שימושי</span><span><i style="background:var(--accent-2)"></i>ינסו כבר השבוע</span></div>
+        <div class="rows" id="parts"></div>
+      </div>
+    </section>
+
+    <section class="tile">
+      <h2>כמה בטוחים שיצליחו לבד <small>1 עד 5</small></h2>
+      <div class="body">
+        <div class="rows" id="conf"></div>
+        <div class="legend"><span><i style="background:var(--neg2)"></i>1</span><span><i style="background:var(--neg1)"></i>2</span><span><i style="background:var(--mid)"></i>3</span><span><i style="background:var(--pos1)"></i>4</span><span><i style="background:var(--pos2)"></i>5 בטוח מאוד</span></div>
+      </div>
+    </section>
+
+    <section class="tile">
+      <h2>קצב ורמה</h2>
+      <div class="body">
+        <div class="mini">
+          <div><p class="lab">הקצב</p><div class="tri" id="pace"></div><div class="legend" id="pace-leg"></div></div>
+          <div><p class="lab">הרמה</p><div class="tri" id="level"></div><div class="legend" id="level-leg"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tile">
+      <h2>במילים שלהם</h2>
+      <div class="cols">
+        <div class="col keep"><h3><i></i>לשמור</h3><div id="keep"></div></div>
+        <div class="col change"><h3><i></i>לשנות</h3><div id="change"></div></div>
+      </div>
+      <div class="empty" id="quotes-empty" hidden><div><b>עוד אין הערות פתוחות</b>הן יופיעו כאן ברגע שייכתבו.</div></div>
+    </section>
+
+    <section class="tile">
+      <h2>ההתחייבויות לשבוע <small id="commit-n"></small></h2>
+      <div class="body">
+        <div class="pills" id="commit-pills"></div>
+        <div class="list" id="commit-list"></div>
+      </div>
+      <div class="empty" id="commit-empty" hidden><div><b>עוד אין התחייבויות</b>כרטיס היציאה הוא השאלה האחרונה.</div></div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  var cfg = window.SURVEY_CONFIG || {};
+  var DEMO = /[?&]demo=1/.test(location.search);
+  if (/[?&]theme=light/.test(location.search)) document.documentElement.setAttribute('data-theme', 'light');
+  var PART_NAME = { gemini: 'Gemini Notebook', app: 'אפליקציה בלי קוד', agent: 'סוכני AI', none: 'עדיין כלום' };
+  var CONF = [['conf_gemini', 'לבדוק הפניה במחברת'], ['conf_app', 'לנהל שיחת אבחון'], ['conf_agent', 'להגדיר הרשאה לסוכן']];
+  var PACE = [['slow', 'איטי מדי', 'w'], ['ok', 'בדיוק', 'g'], ['fast', 'מהיר מדי', 'w']];
+  var LEVEL = [['basic', 'בסיסית מדי', 'w'], ['ok', 'בדיוק', 'g'], ['advanced', 'מתקדמת מדי', 'w']];
+
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function pct(k, n) { return n ? Math.round(k / n * 100) : 0; }
+
+  // QR codes of the survey address
+  try {
+    var qr = qrcode(0, 'M'); qr.addData(cfg.pageUrl); qr.make();
+    $('qr').innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+    $('qr-big').innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+  } catch (e) {}
+  $('url').textContent = (cfg.pageUrl || '').replace(/^https?:\/\//, '');
+
+  $('fs').addEventListener('click', function () {
+    if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+  });
+  $('theme').addEventListener('click', function () {
+    var r = document.documentElement; r.setAttribute('data-theme', r.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'f' || e.key === 'F' || e.key === 'כ') $('fs').click(); });
+
+  /* ---------- Data ---------- */
+  function demoRows() {
+    var rows = [], keeps = ['התרגיל בזוגות', 'הקליפים של הסוכנים', 'הדוגמאות מהיחידה', 'השאלות של האבחון', 'הקצב של החלק השני'],
+      changes = ['פחות שקפים בחלק הראשון', 'יותר זמן לבנות בעצמנו', 'להסביר שוב את ההרשאות', 'הפסקה ארוכה יותר', ''],
+      mats = ['סיכומי הדיונים', 'שיבוץ התורנויות', 'המיילים מהספקים', 'תוכנית ההדרכה', 'דוחות השבועיים', ''],
+      days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'עד סוף השבוע'];
+    var seed = 7; function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    function pick(arr) { return arr[Math.floor(rnd() * arr.length)]; }
+    for (var i = 0; i < 19; i++) {
+      var tool = pick(['gemini', 'app', 'app', 'agent', 'agent']);
+      rows.push({
+        ts: new Date(Date.now() - i * 40000).toISOString(),
+        nps: Math.min(10, Math.max(0, Math.round(7.5 + (rnd() - .4) * 5))),
+        best: tool, tryWeek: pick(['gemini', 'app', 'agent', 'agent', 'none']),
+        conf_gemini: Math.ceil(rnd() * 2) + 3, conf_app: Math.ceil(rnd() * 3) + 2, conf_agent: Math.ceil(rnd() * 4) + 1,
+        pace: pick(['ok', 'ok', 'ok', 'fast', 'slow']), level: pick(['ok', 'ok', 'basic', 'advanced']),
+        keep: rnd() > .4 ? pick(keeps) : '', change: rnd() > .5 ? pick(changes) : '',
+        commit_tool: rnd() > .25 ? tool : '', commit_material: pick(mats), commit_day: pick(days)
+      });
+    }
+    return rows;
+  }
+  function fetchRows() {
+    if (DEMO) return Promise.resolve(demoRows());
+    if (!cfg.endpoint) return Promise.reject(new Error('no endpoint'));
+    return fetch(cfg.endpoint + '?token=' + encodeURIComponent(cfg.token) + '&t=' + Date.now(), { redirect: 'follow', cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (!j || !j.ok) throw new Error(j && j.error || 'server'); return j.rows || []; });
+  }
+
+  /* ---------- Render ---------- */
+  function segs(container, parts, n) {
+    // parts: [{cls, k, label}] ; shows a count inside a segment that is wide enough
+    container.innerHTML = parts.map(function (p) {
+      if (!p.k) return '';
+      var w = pct(p.k, n);
+      return '<span class="sg ' + p.cls + '" style="flex:' + p.k + '" title="' + esc(p.label) + ': ' + p.k + '">' + (w >= 12 ? p.k : '') + '</span>';
+    }).join('');
+  }
+  function legend(container, parts, n, vars) {
+    container.innerHTML = parts.map(function (p, i) {
+      return '<span><i style="background:var(--' + vars[i] + ')"></i>' + esc(p.label) + ' <b class="num">' + pct(p.k, n) + '%</b></span>';
+    }).join('');
+  }
+
+  function render(rows) {
+    var n = rows.length;
+    $('n').textContent = n;
+    $('wait').hidden = n > 0;
+    $('grid').hidden = n === 0;
+    if (!n) return;
+
+    // NPS
+    var npsVals = rows.map(function (r) { return Number(r.nps); }).filter(function (v) { return !isNaN(v); });
+    var m = npsVals.length, det = 0, pas = 0, pro = 0, sum = 0;
+    npsVals.forEach(function (v) { sum += v; if (v >= 9) pro++; else if (v >= 7) pas++; else det++; });
+    var nps = m ? Math.round(pct(pro, m) - pct(det, m)) : 0;
+    $('nps').textContent = (nps > 0 ? '+' : '') + nps;
+    $('nps-note').textContent = m < 5 ? 'מוקדם לקבוע (' + m + ' תשובות)' : (nps >= 50 ? 'מצוין' : nps >= 20 ? 'טוב' : nps >= 0 ? 'סביר' : 'צריך לדבר');
+    var npsParts = [{ cls: 'neg2', k: det, label: 'מפזרים (0 עד 6)' }, { cls: 'mid', k: pas, label: 'ניטרליים (7 עד 8)' }, { cls: 'pos2', k: pro, label: 'ממליצים (9 עד 10)' }];
+    segs($('nps-bar'), npsParts, m);
+    legend($('nps-leg'), npsParts, m, ['neg2', 'mid', 'pos2']);
+    $('nps-avg').textContent = m ? 'ציון ממוצע ' + (sum / m).toFixed(1) + ' מתוך 10' : '';
+
+    // Useful vs will try
+    var best = {}, tryW = {};
+    rows.forEach(function (r) { best[r.best] = (best[r.best] || 0) + 1; tryW[r.tryWeek] = (tryW[r.tryWeek] || 0) + 1; });
+    var ids = ['gemini', 'app', 'agent', 'none'];
+    var maxv = Math.max(1, Math.max.apply(null, ids.map(function (id) { return Math.max(best[id] || 0, tryW[id] || 0); })));
+    $('parts').innerHTML = ids.map(function (id) {
+      var b = best[id] || 0, t = tryW[id] || 0;
+      if (id === 'none' && !t) return '';
+      return '<div class="row"><div class="lab"><span>' + PART_NAME[id] + '</span></div><div class="bars">' +
+        (id === 'none' ? '' : '<div class="bar a" title="הכי שימושי: ' + b + '"><div class="fillb" style="width:' + (b / maxv * 72) + '%"></div><span class="v num">' + b + ' · ' + pct(b, n) + '%</span></div>') +
+        '<div class="bar b" title="ינסו השבוע: ' + t + '"><div class="fillb" style="width:' + (t / maxv * 72) + '%"></div><span class="v num">' + t + ' · ' + pct(t, n) + '%</span></div>' +
+        '</div></div>';
+    }).join('');
+
+    // Confidence, diverging around 3
+    var confData = CONF.map(function (c) {
+      var cnt = [0, 0, 0, 0, 0, 0], s = 0, k = 0;
+      rows.forEach(function (r) { var v = Number(r[c[0]]); if (v >= 1 && v <= 5) { cnt[v]++; s += v; k++; } });
+      return { label: c[1], cnt: cnt, k: k, avg: k ? s / k : 0, neg: cnt[1] + cnt[2] + cnt[3] / 2, pos: cnt[4] + cnt[5] + cnt[3] / 2 };
+    });
+    var half = Math.max(1, Math.max.apply(null, confData.map(function (d) { return Math.max(d.neg, d.pos); })));
+    var scale = 48 / half; // percent of track per answer
+    $('conf').innerHTML = confData.map(function (d) {
+      var start = 50 - d.neg * scale, width = (d.neg + d.pos) * scale;
+      var inner = [1, 2, 3, 4, 5].map(function (v) {
+        var cls = ['', 'neg2', 'neg1', 'mid', 'pos1', 'pos2'][v];
+        return d.cnt[v] ? '<span class="sg ' + cls + '" style="flex:' + d.cnt[v] + '" title="' + v + ': ' + d.cnt[v] + '">' + (d.cnt[v] / d.k >= .14 ? d.cnt[v] : '') + '</span>' : '';
+      }).join('');
+      return '<div class="row"><div class="lab"><span>' + d.label + '</span><span class="num">ממוצע ' + d.avg.toFixed(1) + '</span></div>' +
+        '<div class="div"><div class="seq" style="inset-inline-start:' + start + '%;width:' + width + '%">' + inner + '</div></div></div>';
+    }).join('');
+
+    // Pace and level
+    [['pace', PACE, 'pace-leg'], ['level', LEVEL, 'level-leg']].forEach(function (t) {
+      var cnt = {}; rows.forEach(function (r) { cnt[r[t[0]]] = (cnt[r[t[0]]] || 0) + 1; });
+      var parts = t[1].map(function (o) { return { cls: o[2], k: cnt[o[0]] || 0, label: o[1] }; });
+      var k = parts.reduce(function (s, p) { return s + p.k; }, 0);
+      segs($(t[0]), parts, k);
+      $(t[2]).innerHTML = parts.map(function (p) { return '<span><i style="background:var(--' + (p.cls === 'g' ? 'ok' : 'warm') + ')"></i>' + p.label + ' <b class="num">' + p.k + '</b></span>'; }).join('');
+    });
+
+    // Quotes (newest first, up to 4 each)
+    var keeps = rows.filter(function (r) { return r.keep && String(r.keep).trim(); }).reverse();
+    var changes = rows.filter(function (r) { return r.change && String(r.change).trim(); }).reverse();
+    function quotes(list, key) {
+      var html = list.slice(0, 4).map(function (r) { return '<div class="q">' + esc(r[key]) + '</div>'; }).join('');
+      if (list.length > 4) html += '<p class="more">ועוד ' + (list.length - 4) + '</p>';
+      return html;
+    }
+    $('keep').innerHTML = quotes(keeps, 'keep');
+    $('change').innerHTML = quotes(changes, 'change');
+    $('quotes-empty').hidden = !!(keeps.length || changes.length);
+
+    // Commitments
+    var com = rows.filter(function (r) { return r.commit_tool || (r.commit_material && String(r.commit_material).trim()); }).reverse();
+    var byTool = {}; com.forEach(function (r) { if (r.commit_tool) byTool[r.commit_tool] = (byTool[r.commit_tool] || 0) + 1; });
+    $('commit-n').textContent = com.length ? com.length + ' מתוך ' + n : '';
+    $('commit-pills').innerHTML = ['gemini', 'app', 'agent'].map(function (id) { return '<span class="pill">' + PART_NAME[id] + ' <b class="num">' + (byTool[id] || 0) + '</b></span>'; }).join('');
+    $('commit-list').innerHTML = com.slice(0, 7).map(function (r) {
+      return '<div class="item">' + (r.commit_tool ? '<span class="t">' + PART_NAME[r.commit_tool] + '</span>' : '') +
+        (r.commit_material ? '<span class="m">' + esc(r.commit_material) + '</span>' : '') +
+        (r.commit_day ? '<span class="d">עד ' + esc(r.commit_day) + '</span>' : '') + '</div>';
+    }).join('');
+    $('commit-empty').hidden = !!com.length;
+  }
+
+  /* ---------- Polling ---------- */
+  var last = 0, ok = true;
+  function tickLabel() {
+    var u = $('upd');
+    if (!ok) { u.textContent = cfg.endpoint ? 'אין חיבור לגיליון. מנסים שוב...' : 'הכתובת של הגיליון עוד לא הוגדרה'; return; }
+    if (!last) { u.textContent = 'מתחבר...'; return; }
+    var s = Math.round((Date.now() - last) / 1000);
+    u.textContent = s < 3 ? 'עודכן עכשיו' : 'עודכן לפני ' + s + ' שנ׳';
+  }
+  function refresh() {
+    fetchRows().then(function (rows) { ok = true; last = Date.now(); $('dot').classList.remove('bad'); render(rows); })
+      .catch(function () { ok = false; $('dot').classList.add('bad'); })
+      .finally(tickLabel);
+  }
+  refresh();
+  setInterval(refresh, Math.max(4, cfg.refreshSeconds || 8) * 1000);
+  setInterval(tickLabel, 1000);
+})();
+</script>
+</body>
+</html>
