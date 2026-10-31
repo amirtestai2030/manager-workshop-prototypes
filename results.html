@@ -110,6 +110,8 @@
 
   .mini { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; }
   .mini .lab { font-weight: 700; margin-bottom: .35em; }
+  .mini .wide { grid-column: 1 / -1; }
+  .tri .sg.m { background: var(--mid); color: var(--ink); }
   .tri { display: flex; gap: 2px; height: 1.25em; border-radius: 4px; overflow: hidden; background: var(--sunk); }
   .tri .sg.w { background: var(--warm); } .tri .sg.g { background: var(--ok); }
   :root[data-theme="dark"] .tri .sg { color: #0E1620; }
@@ -194,7 +196,7 @@
     </section>
 
     <section class="tile">
-      <h2>הכי שימושי היום, מול מה שינסו השבוע</h2>
+      <h2>איזו התנסות הכי שימושית, מול מה שינסו השבוע</h2>
       <div class="body">
         <div class="legend"><span><i style="background:var(--accent)"></i>הכי שימושי</span><span><i style="background:var(--accent-2)"></i>ינסו כבר השבוע</span></div>
         <div class="rows" id="parts"></div>
@@ -210,11 +212,12 @@
     </section>
 
     <section class="tile">
-      <h2>קצב ורמה</h2>
+      <h2>קצב, רמה והמבוא</h2>
       <div class="body">
         <div class="mini">
           <div><p class="lab">הקצב</p><div class="tri" id="pace"></div><div class="legend" id="pace-leg"></div></div>
           <div><p class="lab">הרמה</p><div class="tri" id="level"></div><div class="legend" id="level-leg"></div></div>
+          <div class="wide"><p class="lab">הרצאת המבוא על סוכני AI עזרה בהתנסויות</p><div class="tri" id="intro"></div><div class="legend" id="intro-leg"></div></div>
         </div>
       </div>
     </section>
@@ -244,10 +247,12 @@
   var cfg = window.SURVEY_CONFIG || {};
   var DEMO = /[?&]demo=1/.test(location.search);
   if (/[?&]theme=light/.test(location.search)) document.documentElement.setAttribute('data-theme', 'light');
-  var PART_NAME = { gemini: 'Gemini Notebook', app: 'אפליקציה בלי קוד', agent: 'סוכני AI', none: 'עדיין כלום' };
-  var CONF = [['conf_gemini', 'לבדוק הפניה במחברת'], ['conf_app', 'לנהל שיחת אבחון'], ['conf_agent', 'להגדיר הרשאה לסוכן']];
+  var PART_NAME = { gemini: 'Gemini Notebook', app: 'אפליקציה בלי קוד', none: 'עדיין כלום' };
+  var CONF = [['conf_gemini', 'לבדוק הפניה במחברת'], ['conf_app', 'לנהל שיחת אבחון']];
   var PACE = [['slow', 'איטי מדי', 'w'], ['ok', 'בדיוק', 'g'], ['fast', 'מהיר מדי', 'w']];
   var LEVEL = [['basic', 'בסיסית מדי', 'w'], ['ok', 'בדיוק', 'g'], ['advanced', 'מתקדמת מדי', 'w']];
+  var INTRO = [['no', 'לא ממש', 'w'], ['partly', 'חלקית', 'm'], ['very', 'מאוד', 'g']];
+  var SEG_VAR = { w: 'warm', g: 'ok', m: 'mid' };
 
   var $ = function (id) { return document.getElementById(id); };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
@@ -278,12 +283,12 @@
     var seed = 7; function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
     function pick(arr) { return arr[Math.floor(rnd() * arr.length)]; }
     for (var i = 0; i < 19; i++) {
-      var tool = pick(['gemini', 'app', 'app', 'agent', 'agent']);
+      var tool = pick(['gemini', 'gemini', 'app', 'app', 'app']);
       rows.push({
         ts: new Date(Date.now() - i * 40000).toISOString(),
         nps: Math.min(10, Math.max(0, Math.round(7.5 + (rnd() - .4) * 5))),
-        best: tool, tryWeek: pick(['gemini', 'app', 'agent', 'agent', 'none']),
-        conf_gemini: Math.ceil(rnd() * 2) + 3, conf_app: Math.ceil(rnd() * 3) + 2, conf_agent: Math.ceil(rnd() * 4) + 1,
+        best: tool, tryWeek: pick(['gemini', 'app', 'app', 'gemini', 'none']),
+        conf_gemini: Math.ceil(rnd() * 2) + 3, conf_app: Math.ceil(rnd() * 3) + 2, intro: pick(['very', 'very', 'partly', 'partly', 'no']),
         pace: pick(['ok', 'ok', 'ok', 'fast', 'slow']), level: pick(['ok', 'ok', 'basic', 'advanced']),
         keep: rnd() > .4 ? pick(keeps) : '', change: rnd() > .5 ? pick(changes) : '',
         commit_tool: rnd() > .25 ? tool : '', commit_material: pick(mats), commit_day: pick(days)
@@ -336,7 +341,7 @@
     // Useful vs will try
     var best = {}, tryW = {};
     rows.forEach(function (r) { best[r.best] = (best[r.best] || 0) + 1; tryW[r.tryWeek] = (tryW[r.tryWeek] || 0) + 1; });
-    var ids = ['gemini', 'app', 'agent', 'none'];
+    var ids = ['gemini', 'app', 'none'];
     var maxv = Math.max(1, Math.max.apply(null, ids.map(function (id) { return Math.max(best[id] || 0, tryW[id] || 0); })));
     $('parts').innerHTML = ids.map(function (id) {
       var b = best[id] || 0, t = tryW[id] || 0;
@@ -366,12 +371,12 @@
     }).join('');
 
     // Pace and level
-    [['pace', PACE, 'pace-leg'], ['level', LEVEL, 'level-leg']].forEach(function (t) {
+    [['pace', PACE, 'pace-leg'], ['level', LEVEL, 'level-leg'], ['intro', INTRO, 'intro-leg']].forEach(function (t) {
       var cnt = {}; rows.forEach(function (r) { cnt[r[t[0]]] = (cnt[r[t[0]]] || 0) + 1; });
       var parts = t[1].map(function (o) { return { cls: o[2], k: cnt[o[0]] || 0, label: o[1] }; });
       var k = parts.reduce(function (s, p) { return s + p.k; }, 0);
       segs($(t[0]), parts, k);
-      $(t[2]).innerHTML = parts.map(function (p) { return '<span><i style="background:var(--' + (p.cls === 'g' ? 'ok' : 'warm') + ')"></i>' + p.label + ' <b class="num">' + p.k + '</b></span>'; }).join('');
+      $(t[2]).innerHTML = parts.map(function (p) { return '<span><i style="background:var(--' + SEG_VAR[p.cls] + ')"></i>' + p.label + ' <b class="num">' + p.k + '</b></span>'; }).join('');
     });
 
     // Quotes (newest first, up to 4 each)
@@ -390,7 +395,7 @@
     var com = rows.filter(function (r) { return r.commit_tool || (r.commit_material && String(r.commit_material).trim()); }).reverse();
     var byTool = {}; com.forEach(function (r) { if (r.commit_tool) byTool[r.commit_tool] = (byTool[r.commit_tool] || 0) + 1; });
     $('commit-n').textContent = com.length ? com.length + ' מתוך ' + n : '';
-    $('commit-pills').innerHTML = ['gemini', 'app', 'agent'].map(function (id) { return '<span class="pill">' + PART_NAME[id] + ' <b class="num">' + (byTool[id] || 0) + '</b></span>'; }).join('');
+    $('commit-pills').innerHTML = ['gemini', 'app'].map(function (id) { return '<span class="pill">' + PART_NAME[id] + ' <b class="num">' + (byTool[id] || 0) + '</b></span>'; }).join('');
     $('commit-list').innerHTML = com.slice(0, 7).map(function (r) {
       return '<div class="item">' + (r.commit_tool ? '<span class="t">' + PART_NAME[r.commit_tool] + '</span>' : '') +
         (r.commit_material ? '<span class="m">' + esc(r.commit_material) + '</span>' : '') +

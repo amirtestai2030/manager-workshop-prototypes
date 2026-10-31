@@ -233,19 +233,18 @@
 (function () {
   var cfg = window.SURVEY_CONFIG || {};
   var DEMO = /[?&]demo=1/.test(location.search);
-  var KEY = 'workshop-survey-2026-11';
+  var KEY = 'workshop-survey-2026-11-v2';
   var TOTAL = 7;
 
   var PARTS = [
     { id: 'gemini', icon: 'i-book', title: 'Gemini Notebook', sub: 'מחברת שעונה רק מהמקורות שלכם' },
-    { id: 'app', icon: 'i-app', title: 'אפליקציה בלי קוד', sub: 'אבחון, אפיון, בנייה' },
-    { id: 'agent', icon: 'i-bolt', title: 'סוכני AI', sub: 'משימה, הרשאה, בקרה' }
+    { id: 'app', icon: 'i-app', title: 'אפליקציה בלי קוד', sub: 'אבחון, אפיון, בנייה' }
   ];
-  var PART_NAME = { gemini: 'Gemini Notebook', app: 'אפליקציה בלי קוד', agent: 'סוכני AI', none: 'עדיין כלום' };
+  var PART_NAME = { gemini: 'Gemini Notebook', app: 'אפליקציה בלי קוד', none: 'עדיין כלום' };
+  var INTRO_NAME = { no: 'לא ממש', partly: 'חלקית', very: 'מאוד' };
   var CONF = [
     { id: 'conf_gemini', q: 'לבדוק הפניה במחברת לפני שאני מסתמך על נתון' },
-    { id: 'conf_app', q: 'לנהל שיחת אבחון לפני שמבקשים אפליקציה' },
-    { id: 'conf_agent', q: 'להגדיר לסוכן משימה עם הרשאה מינימלית' }
+    { id: 'conf_app', q: 'לנהל שיחת אבחון לפני שמבקשים אפליקציה' }
   ];
   var DAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'עד סוף השבוע'];
 
@@ -322,7 +321,7 @@
     s.appendChild(el('p', 'hint', 'מקשים 1 עד ' + items.length + ' בוחרים מהר.'));
     return s;
   }
-  screens[2] = function () { return partScreen(2, 'best', 'איזה חלק היה הכי שימושי בשבילכם?', 'לא איזה היה מעניין. איזה תשתמשו בו.', PARTS); };
+  screens[2] = function () { return partScreen(2, 'best', 'איזו התנסות הייתה הכי שימושית בשבילכם?', 'לא איזו הייתה מעניינת. באיזו תשתמשו.', PARTS); };
   screens[3] = function () {
     return partScreen(3, 'tryWeek', 'מה תנסו בפועל כבר השבוע?', 'תשובה כנה עוזרת יותר מתשובה מנומסת.',
       PARTS.concat([{ id: 'none', icon: 'i-none', title: 'עדיין כלום', sub: 'צריך עוד זמן או עוד תרגול' }]));
@@ -362,11 +361,12 @@
 
   screens[5] = function () {
     var s = el('section', 'screen');
-    s.appendChild(header(5, 'הקצב והרמה', 'שתי הקשות.'));
+    s.appendChild(header(5, 'הקצב, הרמה והמבוא', 'שלוש הקשות.'));
     var rows = el('div', 'rows');
     var defs = [
       { id: 'pace', q: 'הקצב של היום היה', opts: [['slow', 'איטי מדי'], ['ok', 'בדיוק'], ['fast', 'מהיר מדי']] },
-      { id: 'level', q: 'הרמה הייתה', opts: [['basic', 'בסיסית מדי'], ['ok', 'בדיוק'], ['advanced', 'מתקדמת מדי']] }
+      { id: 'level', q: 'הרמה הייתה', opts: [['basic', 'בסיסית מדי'], ['ok', 'בדיוק'], ['advanced', 'מתקדמת מדי']] },
+      { id: 'intro', q: 'הרצאת המבוא על סוכני AI עזרה לי בהתנסויות', opts: [['no', 'לא ממש'], ['partly', 'חלקית'], ['very', 'מאוד']] }
     ];
     defs.forEach(function (d) {
       var r = el('div', 'row' + (a[d.id] ? ' done' : ''));
@@ -377,7 +377,7 @@
         b.setAttribute('aria-pressed', String(a[d.id] === o[0]));
         b.addEventListener('click', function () {
           a[d.id] = this.dataset.v; save(); pressGroup(segs, '.seg', a[d.id]); r.classList.add('done');
-          if (a.pace && a.level) { next.disabled = false; advanceSoon(450); }
+          if (a.pace && a.level && a.intro) { next.disabled = false; advanceSoon(450); }
         });
         segs.appendChild(b);
       });
@@ -387,7 +387,7 @@
     s.appendChild(rows);
     var act = el('div', 'actions');
     var next = el('button', 'btn primary', 'המשך ' + icon('i-next')); next.type = 'button';
-    next.disabled = !(a.pace && a.level);
+    next.disabled = !(a.pace && a.level && a.intro);
     next.addEventListener('click', function () { go(6); });
     act.appendChild(next);
     s.appendChild(act);
@@ -503,10 +503,10 @@
   }
   function payload() {
     return {
-      token: cfg.token, v: 1,
+      token: cfg.token, v: 2,
       nps: a.nps, best: a.best || '', tryWeek: a.tryWeek || '',
-      conf_gemini: a.conf_gemini || '', conf_app: a.conf_app || '', conf_agent: a.conf_agent || '',
-      pace: a.pace || '', level: a.level || '',
+      conf_gemini: a.conf_gemini || '', conf_app: a.conf_app || '',
+      pace: a.pace || '', level: a.level || '', intro: a.intro || '',
       keep: (a.keep || '').trim(), change: (a.change || '').trim(),
       commit_tool: a.commit_tool || '', commit_material: (a.commit_material || '').trim(), commit_day: a.commit_day || ''
     };
@@ -518,8 +518,9 @@
       'ממליץ: ' + p.nps + '/10',
       'הכי שימושי: ' + (PART_NAME[p.best] || '-'),
       'אנסה השבוע: ' + (PART_NAME[p.tryWeek] || '-'),
-      'ביטחון (הפניה/אבחון/הרשאה): ' + [p.conf_gemini, p.conf_app, p.conf_agent].join('/'),
+      'ביטחון (הפניה/אבחון): ' + [p.conf_gemini, p.conf_app].join('/'),
       'קצב: ' + (lvl[p.pace] || '-') + ' · רמה: ' + (lvl[p.level] || '-'),
+      'המבוא על סוכנים עזר: ' + (INTRO_NAME[p.intro] || '-'),
       p.keep ? 'לשמור: ' + p.keep : '', p.change ? 'לשנות: ' + p.change : '',
       commitText() ? 'התחייבות: ' + commitText() : ''
     ].filter(Boolean).join('\n');
