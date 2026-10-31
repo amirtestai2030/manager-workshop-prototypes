@@ -396,24 +396,31 @@
 
   screens[6] = function () {
     var s = el('section', 'screen');
-    s.appendChild(header(6, 'דבר אחד לשמור, דבר אחד לשנות', 'שורה אחת מספיקה. זה החלק הכי שווה בסקר.'));
+    s.appendChild(header(6, 'דבר אחד לשמור, דבר אחד לשנות', 'שתי שורות קצרות. זה החלק שהכי עוזר לשפר את הסדנה.'));
     var f = el('div', 'fields');
-    [['keep', 'לשמור בסדנה הבאה', 'למשל: התרגיל בזוגות, הקליפים, הדוגמאות מהיחידה'], ['change', 'לשנות או להוריד', 'למשל: פחות שקפים, יותר זמן לתרגול, הסבר אחר על...']].forEach(function (d) {
+    var MIN = 2;
+    function filled(k) { return (a[k] || '').trim().length >= MIN; }
+    function update() {
+      var ok = filled('keep') && filled('change');
+      next.disabled = !ok;
+      need.hidden = ok;
+    }
+    [['keep', 'לשמור בסדנה הבאה', 'למשל: התרגיל בזוגות, הקליפים, הדוגמאות מהיחידה'], ['change', 'לשנות או לשפר', 'למשל: יותר זמן לתרגול, הסבר אחר על..., פחות שקפים']].forEach(function (d) {
       var w = el('div', 'field');
-      w.innerHTML = '<label for="f-' + d[0] + '">' + d[1] + '</label><textarea id="f-' + d[0] + '" maxlength="240" placeholder="' + d[2] + '"></textarea><span class="meta"><span class="n">0</span>/240</span>';
+      w.innerHTML = '<label for="f-' + d[0] + '">' + d[1] + '</label><textarea id="f-' + d[0] + '" maxlength="240" required aria-required="true" placeholder="' + d[2] + '"></textarea><span class="meta"><span class="n">0</span>/240</span>';
       var ta = w.querySelector('textarea'); ta.value = a[d[0]] || '';
       var n = w.querySelector('.n'); n.textContent = ta.value.length;
-      ta.addEventListener('input', function () { a[d[0]] = ta.value; n.textContent = ta.value.length; save(); });
+      ta.addEventListener('input', function () { a[d[0]] = ta.value; n.textContent = ta.value.length; save(); update(); });
       f.appendChild(w);
     });
     s.appendChild(f);
     var act = el('div', 'actions');
     var next = el('button', 'btn primary', 'המשך ' + icon('i-next')); next.type = 'button';
-    next.addEventListener('click', function () { go(7); });
-    var skip = el('button', 'btn ghost', 'דילוג'); skip.type = 'button';
-    skip.addEventListener('click', function () { a.keep = ''; a.change = ''; save(); go(7); });
-    act.appendChild(next); act.appendChild(skip);
+    next.addEventListener('click', function () { if (!next.disabled) go(7); });
+    var need = el('span', 'hint', 'כתבו משהו קצר בשני השדות כדי להמשיך.');
+    act.appendChild(next); act.appendChild(need);
     s.appendChild(act);
+    update();
     return s;
   };
 
